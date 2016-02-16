@@ -26,6 +26,7 @@
 #include "dev-m25p80.h"
 #include "dev-spi.h"
 #include "dev-wmac.h"
+#include "dev-usb.h"
 #include "machtypes.h"
 
 #define MAC1200R_GPIO_LED_WLAN2G	13
@@ -148,6 +149,8 @@ static void __init mac1200r_setup(void)
 				 AR934X_GPIO_OUT_LED_LINK0);
 	ath79_gpio_output_select(MAC1200R_GPIO_LED_WAN,
 				 AR934X_GPIO_OUT_LED_LINK4);
+
+	ath79_register_usb();
 }
 
 MIPS_MACHINE(ATH79_MACH_MC_MAC1200R, "MC-MAC1200R",

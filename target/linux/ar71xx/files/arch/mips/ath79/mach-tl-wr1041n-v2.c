@@ -25,6 +25,7 @@
 #include "dev-m25p80.h"
 #include "dev-spi.h"
 #include "dev-wmac.h"
+#include "dev-usb.h"
 #include "machtypes.h"
 
 #define TL_WR1041NV2_GPIO_BTN_RESET	14
@@ -132,6 +133,8 @@ static void __init tl_wr1041nv2_setup(void)
 	ath79_eth0_data.mii_bus_dev = &ath79_mdio0_device.dev;
 	ath79_eth0_pll_data.pll_1000 = 0x06000000;
 	ath79_register_eth(0);
+
+	ath79_register_usb();
 }
 
 MIPS_MACHINE(ATH79_MACH_TL_WR1041N_V2, "TL-WR1041N-v2",

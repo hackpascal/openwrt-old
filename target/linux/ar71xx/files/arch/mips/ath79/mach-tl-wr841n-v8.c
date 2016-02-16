@@ -280,6 +280,8 @@ static void __init tl_wr941nd_v5_setup(void)
 	ath79_register_gpio_keys_polled(1, TL_WR841NV8_KEYS_POLL_INTERVAL,
 					ARRAY_SIZE(tl_wr841n_v8_gpio_keys),
 					tl_wr841n_v8_gpio_keys);
+
+	ath79_register_usb();
 }
 
 MIPS_MACHINE(ATH79_MACH_TL_WR941ND_V5, "TL-WR941ND-v5", "TP-LINK TL-WR941N/ND v5",

@@ -114,6 +114,8 @@ static void __init tl_ap123_setup(void)
 	ath79_register_eth(0);
 
 	ath79_register_wmac(ee, mac);
+
+	ath79_register_usb();
 }
 
 static void __init tl_wa830re_v2_setup(void)

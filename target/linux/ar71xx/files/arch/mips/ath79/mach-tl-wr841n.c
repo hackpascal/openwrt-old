@@ -20,6 +20,7 @@
 #include "dev-leds-gpio.h"
 #include "dev-m25p80.h"
 #include "machtypes.h"
+#include "dev-usb.h"
 #include "pci.h"
 
 #define TL_WR841ND_V1_GPIO_LED_SYSTEM		2
@@ -134,6 +135,8 @@ static void __init tl_wr841n_v1_setup(void)
 					ARRAY_SIZE(tl_wr841n_v1_gpio_keys),
 					tl_wr841n_v1_gpio_keys);
 	ath79_register_pci();
+
+	ath79_register_usb();
 }
 
 MIPS_MACHINE(ATH79_MACH_TL_WR841N_V1, "TL-WR841N-v1.5", "TP-LINK TL-WR841N v1",

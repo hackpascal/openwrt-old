@@ -29,6 +29,7 @@
 #include "dev-leds-gpio.h"
 #include "dev-m25p80.h"
 #include "dev-wmac.h"
+#include "dev-usb.h"
 #include "machtypes.h"
 #include "pci.h"
 
@@ -118,7 +119,7 @@ static void __init tl_wa7210n_v2_setup(void)
 
 	ath79_register_m25p80(&tl_wa7210n_v2_flash_data);
 
-	ath79_register_pci();
+	ath79_register_usb();
 }
 
 MIPS_MACHINE(ATH79_MACH_TL_WA7210N_V2, "TL-WA7210N-v2", "TP-LINK TL-WA7210N v2",

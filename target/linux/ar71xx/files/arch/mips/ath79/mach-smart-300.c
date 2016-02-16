@@ -21,6 +21,7 @@
 #include "dev-leds-gpio.h"
 #include "dev-m25p80.h"
 #include "dev-wmac.h"
+#include "dev-usb.h"
 #include "machtypes.h"
 
 #define SMART_300_GPIO_LED_WLAN		13
@@ -129,6 +130,8 @@ static void __init smart_300_setup(void)
 
 	gpio_request(SMART_300_GPIO_LED_POWER, "power");
 	gpio_direction_output(SMART_300_GPIO_LED_POWER, GPIOF_OUT_INIT_LOW);
+
+	ath79_register_usb();
 }
 
 MIPS_MACHINE(ATH79_MACH_SMART_300, "SMART-300", "NC-LINK SMART-300",

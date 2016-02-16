@@ -151,6 +151,11 @@ static void __init tl_ap121_setup(void)
 	ath79_register_eth(0);
 
 	ath79_register_wmac(ee, mac);
+
+	gpio_request_one(TL_MR3220V2_GPIO_USB_POWER,
+			 GPIOF_OUT_INIT_HIGH | GPIOF_EXPORT_DIR_FIXED,
+			 "USB power");
+	ath79_register_usb();
 }
 
 static void __init tl_wr741ndv4_setup(void)
@@ -170,11 +175,6 @@ MIPS_MACHINE(ATH79_MACH_TL_WR741ND_V4, "TL-WR741ND-v4",
 static void __init tl_mr3220v2_setup(void)
 {
 	tl_ap121_setup();
-
-	gpio_request_one(TL_MR3220V2_GPIO_USB_POWER,
-			 GPIOF_OUT_INIT_HIGH | GPIOF_EXPORT_DIR_FIXED,
-			 "USB power");
-	ath79_register_usb();
 
 	ath79_register_leds_gpio(-1, ARRAY_SIZE(tl_wr741ndv4_leds_gpio),
 				 tl_wr741ndv4_leds_gpio);

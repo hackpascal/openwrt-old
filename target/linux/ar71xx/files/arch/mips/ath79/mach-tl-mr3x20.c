@@ -141,6 +141,7 @@ static void __init tl_wr841n_v7_setup(void)
 	ath79_register_leds_gpio(-1, ARRAY_SIZE(tl_mr3x20_leds_gpio) - 1,
 				 tl_mr3x20_leds_gpio);
 	ap9x_pci_setup_wmac_led_pin(0, 0);
+	tl_mr3x20_usb_setup();
 }
 
 MIPS_MACHINE(ATH79_MACH_TL_WR841N_V7, "TL-WR841N-v7",

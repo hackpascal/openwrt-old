@@ -20,6 +20,7 @@
 #include "dev-leds-gpio.h"
 #include "dev-m25p80.h"
 #include "dev-wmac.h"
+#include "dev-usb.h"
 #include "machtypes.h"
 
 #define TL_WR841NV9_GPIO_LED_WLAN	13
@@ -126,6 +127,8 @@ static void __init tl_ap143_setup(void)
 
 	ath79_init_mac(tmpmac, mac, 0);
 	ath79_register_wmac(ee, tmpmac);
+
+	ath79_register_usb();
 }
 
 static void __init tl_wr841n_v9_setup(void)
