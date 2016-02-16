@@ -806,7 +806,7 @@ endef
 # Chinese version (unlike European) is similar to the TL-WDR3500
 define Device/tl-wr941nd-v6-cn
     $(Device/tplink-4mlzma)
-    BOARDNAME := TL-WDR3500
+    BOARDNAME := TL-WR941N-v6
     DEVICE_PROFILE := TLWR941
     TPLINK_HWID := 0x09410006
 endef
