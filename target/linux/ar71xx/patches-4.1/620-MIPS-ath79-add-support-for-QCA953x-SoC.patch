@@ -177,15 +177,24 @@ meaning of the bits CPUCLK_FROM_CPUPLL and DDRCLK_FROM_DDRPLL is reversed.
  		platform_device_register(&ath79_uart_device);
 --- a/arch/mips/ath79/dev-usb.c
 +++ b/arch/mips/ath79/dev-usb.c
-@@ -236,6 +236,30 @@ static void __init ar934x_usb_setup(void
+@@ -236,6 +236,39 @@ static void __init ar934x_usb_setup(void
  			   &ath79_ehci_pdata_v2, sizeof(ath79_ehci_pdata_v2));
  }
  
 +static void __init qca953x_usb_setup(void)
 +{
-+	u32 bootstrap;
++	u32 bootstrap, val;
 +
 +	bootstrap = ath79_reset_rr(QCA953X_RESET_REG_BOOTSTRAP);
++
++	val = ath79_pll_rr(QCA953X_PLL_SWITCH_CLOCK_CONTROL_REG);
++	val &= ~QCA953X_PLL_USB_REFCLK_FREQ_SEL_MASK;
++	val |= (2 << QCA953X_PLL_USB_REFCLK_FREQ_SEL_SHIFT);
++	ath79_pll_wr(QCA953X_PLL_SWITCH_CLOCK_CONTROL_REG, val);
++
++	val = ath79_reset_rr(QCA953X_RESET_REG_CLKGAT);
++	val |= BIT(7);
++	ath79_reset_wr(QCA953X_RESET_REG_CLKGAT, val);
 +
 +	ath79_device_reset_set(QCA953X_RESET_USBSUS_OVERRIDE);
 +	udelay(1000);
@@ -208,7 +217,7 @@ meaning of the bits CPUCLK_FROM_CPUPLL and DDRCLK_FROM_DDRPLL is reversed.
  static void qca955x_usb_reset_notifier(struct platform_device *pdev)
  {
  	u32 base;
-@@ -286,6 +310,8 @@ void __init ath79_register_usb(void)
+@@ -286,6 +319,8 @@ void __init ath79_register_usb(void)
  		ar933x_usb_setup();
  	else if (soc_is_ar934x())
  		ar934x_usb_setup();
