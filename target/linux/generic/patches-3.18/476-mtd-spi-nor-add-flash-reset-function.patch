@@ -1,0 +1,153 @@
+--- a/drivers/mtd/devices/m25p80.c
++++ b/drivers/mtd/devices/m25p80.c
+@@ -185,6 +185,47 @@
+ }
+ 
+ /*
++ * Reset hole flash chip. Only be avaliable for chips size >= 32MiB
++ */
++static inline int m25p80_reset(struct m25p *flash)
++{
++	struct spi_nor *nor = &flash->spi_nor;
++	struct spi_device *spi = flash->spi;
++	struct spi_transfer t[2];
++	struct spi_message m;
++	char command[2];
++	int ret;
++
++	if (nor->addr_width != 4)
++		return 0;
++
++	/* Wait till previous operation is done. */
++	ret = nor->wait_till_ready(nor);
++	if (ret)
++		return ret;
++
++	spi_message_init(&m);
++	memset(t, 0, (sizeof t));
++
++	t[0].tx_buf = &command[0];
++	t[0].len = 1;
++	t[0].cs_change = 1;
++	spi_message_add_tail(&t[0], &m);
++
++	t[1].tx_buf = &command[1];
++	t[1].len = 1;
++	t[1].cs_change = 1;
++	spi_message_add_tail(&t[1], &m);
++
++	command[0] = SPINOR_OP_RSTEN;
++	command[1] = SPINOR_OP_RESET;
++
++	spi_sync(flash->spi, &m);
++
++	return 0;
++}
++
++/*
+  * board specific setup should have ensured the SPI clock used here
+  * matches what the READ command supports, at least until this driver
+  * understands FAST_READ (for clocks over 25 MHz).
+@@ -255,12 +296,32 @@
+ static int m25p_remove(struct spi_device *spi)
+ {
+ 	struct m25p	*flash = spi_get_drvdata(spi);
++	struct spi_nor	*nor = flash->mtd.priv;
++
++	/* Exit 4b mode */
++	spi_nor_set_4byte(nor, 0);
++
++	/* Reset flash */
++	m25p80_reset(flash);
+ 
+ 	/* Clean up MTD stuff. */
+ 	return mtd_device_unregister(&flash->mtd);
+ }
+ 
+ 
++static void m25p_shutdown(struct spi_device *spi)
++{
++	struct m25p	*flash = spi_get_drvdata(spi);
++	struct spi_nor	*nor = flash->mtd.priv;
++
++	/* Exit 4b mode */
++	spi_nor_set_4byte(nor, 0);
++
++	/* Reset flash */
++	m25p80_reset(flash);
++}
++
++
+ /*
+  * XXX This needs to be kept in sync with spi_nor_ids.  We can't share
+  * it with spi-nor, because if this is built as a module then modpost
+@@ -326,6 +387,7 @@
+ 	.id_table	= m25p_ids,
+ 	.probe	= m25p_probe,
+ 	.remove	= m25p_remove,
++	.shutdown	= m25p_shutdown,
+ 
+ 	/* REVISIT: many of these chips have deep power-down modes, which
+ 	 * should clearly be entered on suspend() to minimize power use.
+--- a/drivers/mtd/spi-nor/spi-nor.c
++++ b/drivers/mtd/spi-nor/spi-nor.c
+@@ -987,6 +987,8 @@
+ 
+ 	mutex_init(&nor->lock);
+ 
++	nor->jedec_id = info->jedec_id;
++
+ 	/*
+ 	 * Atmel, SST and Intel/Numonyx serial nor tend to power
+ 	 * up with the software protection bits set
+@@ -1150,6 +1152,15 @@
+ }
+ EXPORT_SYMBOL_GPL(spi_nor_scan);
+ 
++int spi_nor_set_4byte(struct spi_nor *nor, int enable)
++{
++	if (!nor)
++		return -EINVAL;
++
++	return set_4byte(nor, nor->jedec_id, enable);
++}
++EXPORT_SYMBOL_GPL(spi_nor_set_4byte);
++
+ static const struct spi_device_id *spi_nor_match_id(const char *name)
+ {
+ 	const struct spi_device_id *id = spi_nor_ids;
+--- a/include/linux/mtd/spi-nor.h
++++ b/include/linux/mtd/spi-nor.h
+@@ -44,6 +44,10 @@
+ #define SPINOR_OP_PP_4B		0x12	/* Page program (up to 256 bytes) */
+ #define SPINOR_OP_SE_4B		0xdc	/* Sector erase (usually 64KiB) */
+ 
++/* Reset opcodes */
++#define SPINOR_OP_RSTEN		0x66	/* Enable reset */
++#define SPINOR_OP_RESET		0x99	/* Reset device */
++
+ /* Used for SST flashes only. */
+ #define SPINOR_OP_BP		0x02	/* Byte program */
+ #define SPINOR_OP_WRDI		0x04	/* Write disable */
+@@ -152,6 +156,7 @@
+ 	struct mtd_info		*mtd;
+ 	struct mutex		lock;
+ 	struct device		*dev;
++	u32			jedec_id;
+ 	u32			page_size;
+ 	u8			addr_width;
+ 	u8			erase_opcode;
+@@ -200,4 +205,13 @@
+  */
+ int spi_nor_scan(struct spi_nor *nor, const char *name, enum read_mode mode);
+ 
++/**
++ * spi_nor_set_4byte() - set SPI NOR address mode
++ * @nor:	the spi_nor structure
++ * @enable:	whether to enable 4-byte address mode
++ *
++ * Return: 0 for success, others for failure.
++ */
++int spi_nor_set_4byte(struct spi_nor *nor, int enable);
++
+ #endif
