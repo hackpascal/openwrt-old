@@ -592,6 +592,14 @@ define Device/tl-wr720n-v4
 endef
 TARGET_DEVICES += tl-wr703n-v1 tl-wr710n-v1 tl-wr710n-v2 tl-wr720n-v3 tl-wr720n-v4
 
+define Device/tl-wr340g-v7
+    $(Device/tplink-4mlzma)
+    BOARDNAME := TL-WR740N-v5
+    DEVICE_PROFILE := TLWR340
+    TPLINK_HWID := 0x03400007
+    CONSOLE := ttyATH0,115200
+endef
+
 define Device/tl-wr740n-v1
     $(Device/tplink-4m)
     BOARDNAME := TL-WR741ND
@@ -622,6 +630,14 @@ define Device/tl-wr740n-v5
     CONSOLE := ttyATH0,115200
 endef
 
+define Device/tl-wr740n-v5-cn
+    $(Device/tplink-4mlzma)
+    BOARDNAME := TL-WR740N-v5
+    DEVICE_PROFILE := TLWR740
+    TPLINK_HWID := 0x07400005
+    CONSOLE := ttyATH0,115200
+endef
+
 define Device/tl-wr741nd-v1
     $(Device/tplink-4m)
     BOARDNAME := TL-WR741ND
@@ -644,11 +660,27 @@ define Device/tl-wr741nd-v4
     CONSOLE := ttyATH0,115200
 endef
 
+define Device/tl-wr741n-v4-cn
+    $(Device/tplink-4mlzma)
+    BOARDNAME := TL-WR740N-v5
+    DEVICE_PROFILE := TLWR741
+    TPLINK_HWID := 0x07410004
+    CONSOLE := ttyATH0,115200
+endef
+
 define Device/tl-wr741nd-v5
     $(Device/tplink-4mlzma)
     BOARDNAME := TL-WR741ND-v4
     DEVICE_PROFILE := TLWR741
     TPLINK_HWID := 0x07400005
+    CONSOLE := ttyATH0,115200
+endef
+
+define Device/tl-wr742n-v5
+    $(Device/tplink-4mlzma)
+    BOARDNAME := TL-WR742N-v5
+    DEVICE_PROFILE := TLWR742
+    TPLINK_HWID := 0x07420005
     CONSOLE := ttyATH0,115200
 endef
 
@@ -666,7 +698,15 @@ define Device/tl-wr743nd-v2
     TPLINK_HWID := 0x07430002
     CONSOLE := ttyATH0,115200
 endef
-TARGET_DEVICES += tl-wr740n-v1 tl-wr740n-v3 tl-wr740n-v4 tl-wr740n-v5 tl-wr741nd-v1 tl-wr741nd-v2 tl-wr741nd-v4 tl-wr741nd-v5 tl-wr743nd-v1 tl-wr743nd-v2
+
+define Device/tl-wr745n-v2
+    $(Device/tplink-4mlzma)
+    BOARDNAME := TL-WR742N-v5
+    DEVICE_PROFILE := TLWR745
+    TPLINK_HWID := 0x07450002
+    CONSOLE := ttyATH0,115200
+endef
+TARGET_DEVICES += tl-wr340g-v7 tl-wr740n-v1 tl-wr740n-v3 tl-wr740n-v4 tl-wr740n-v5 tl-wr740n-v5-cn tl-wr741nd-v1 tl-wr741nd-v2 tl-wr741nd-v4 tl-wr741n-v4-cn tl-wr741nd-v5 tl-wr742n-v5 tl-wr743nd-v1 tl-wr743nd-v2 tl-wr745n-v2
 
 define Device/tl-wr841nd-v3
     $(Device/tplink-4m)

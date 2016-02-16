@@ -299,6 +299,17 @@ endef
 $(eval $(call Profile,TLWDR6500V2))
 
 
+define Profile/TLWR340
+	NAME:=TP-LINK TL-WR340G+
+	PACKAGES:=kmod-usb-core kmod-usb2
+endef
+
+define Profile/TLWR340/Description
+	Package set optimized for the TP-LINK TL-WR340G+.
+endef
+$(eval $(call Profile,TLWR340))
+
+
 define Profile/TLWR740
 	NAME:=TP-LINK TL-WR740N/ND
 	PACKAGES:=
@@ -321,6 +332,17 @@ endef
 $(eval $(call Profile,TLWR741))
 
 
+define Profile/TLWR742
+	NAME:=TP-LINK TL-WR742N/ND
+	PACKAGES:=
+endef
+
+define Profile/TLWR742/Description
+	Package set optimized for the TP-LINK TL-WR742N/ND.
+endef
+$(eval $(call Profile,TLWR742))
+
+
 define Profile/TLWR743
 	NAME:=TP-LINK TL-WR743N/ND
 	PACKAGES:=
@@ -330,6 +352,17 @@ define Profile/TLWR743/Description
 	Package set optimized for the TP-LINK TL-WR743N/ND.
 endef
 $(eval $(call Profile,TLWR743))
+
+
+define Profile/TLWR745
+	NAME:=TP-LINK TL-WR745N/ND
+	PACKAGES:=
+endef
+
+define Profile/TLWR745/Description
+	Package set optimized for the TP-LINK TL-WR745N/ND.
+endef
+$(eval $(call Profile,TLWR745))
 
 
 define Profile/TLWR841
