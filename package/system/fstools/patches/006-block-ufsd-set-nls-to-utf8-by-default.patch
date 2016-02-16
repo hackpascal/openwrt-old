@@ -1,0 +1,39 @@
+--- a/block.c
++++ b/block.c
+@@ -561,6 +561,10 @@
+ 	else
+ 		printf("\toption\tdevice\t'%s'\n", pr->dev);
+ 	printf("\toption\tfstype\t'%s'\n", pr->id->name);
++
++	if (fs_has_ufsd && !strcmp(pr->id->name, "ntfs"))
++		printf("\toption\toptions\t'nls=utf8'\n");
++
+ 	printf("\toption\tenabled\t'0'\n\n");
+ 
+ 	return 0;
+@@ -758,7 +762,7 @@
+ 	struct mount *m;
+ 	char *device;
+ 	const char *fstype;
+-	const char *fuse = "";
++	const char *fuse = "", *options = "";
+ 	int use_fuse = 0;
+ 
+ 	if (!pr)
+@@ -772,6 +776,7 @@
+ 		if (fs_has_ufsd)
+ 		{
+ 			fstype = "ufsd";
++			options = "nls=utf8";
+ 		}
+ 		else if (fs_has_ntfs3g)
+ 		{
+@@ -853,7 +858,7 @@
+ 		if (use_fuse)
+ 			err = mount_fuse(pr->dev, target, fuse, 0, "");
+ 		else
+-			err = mount(pr->dev, target, fstype, 0, "");
++			err = mount(pr->dev, target, fstype, 0, options);
+ 
+ 		if (err)
+ 			ULOG_ERR("mounting %s (%s) as %s failed (%d) - %s\n",

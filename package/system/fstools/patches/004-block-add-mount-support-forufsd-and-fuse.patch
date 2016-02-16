@@ -1,0 +1,250 @@
+--- a/block.c
++++ b/block.c
+@@ -22,6 +22,8 @@
+ #include <dirent.h>
+ #include <stdarg.h>
+ #include <string.h>
++#include <fcntl.h>
++#include <malloc.h>
+ 
+ #include <sys/stat.h>
+ #include <sys/types.h>
+@@ -71,6 +73,9 @@
+ static LIST_HEAD(devices);
+ static int anon_mount, anon_swap, auto_mount, auto_swap, check_fs;
+ static unsigned int delay_root;
++static int fs_has_ufsd;
++static int fs_has_exfat;
++static int fs_has_ntfs3g;
+ 
+ enum {
+ 	CFG_ANON_MOUNT,
+@@ -554,6 +559,7 @@
+ 		printf("\toption\tuuid\t'%s'\n", pr->uuid);
+ 	else
+ 		printf("\toption\tdevice\t'%s'\n", pr->dev);
++	printf("\toption\tfstype\t'%s'\n", pr->id->name);
+ 	printf("\toption\tenabled\t'0'\n\n");
+ 
+ 	return 0;
+@@ -686,14 +692,101 @@
+ 	}
+ }
+ 
++static void mount_flags_to_string(char *param, unsigned long mountflags)
++{
++	param[0] = 0;
++
++	if (mountflags & MS_SYNCHRONOUS)
++		strcat(param, "sync,");
++	else
++		strcat(param, "async,");
++
++	if (mountflags & MS_DIRSYNC)
++		strcat(param, "dirsync,");
++
++	if (mountflags & MS_MANDLOCK)
++		strcat(param, "mand,");
++
++	if (mountflags & MS_NOATIME)
++		strcat(param, "noatime,");
++
++	if (mountflags & MS_NODEV)
++		strcat(param, "nodev,");
++
++	if (mountflags & MS_NODIRATIME)
++		strcat(param, "nodiratime,");
++
++	if (mountflags & MS_NOEXEC)
++		strcat(param, "noexec,");
++
++	if (mountflags & MS_NOSUID)
++		strcat(param, "nosuid,");
++
++	if (mountflags & MS_RDONLY)
++		strcat(param, "ro,");
++	else
++		strcat(param, "rw,");
++
++	if (mountflags & MS_RELATIME)
++		strcat(param, "relatime,");
++
++	if (mountflags & MS_STRICTATIME)
++		strcat(param, "strictatime,");
++
++	if (param[0])
++		param[strlen(param) - 1] = 0;
++}
++
++static int mount_fuse(const char *source, const char *target,
++		      const char *fuse_helper, unsigned long mountflags,
++		      const char *options)
++{
++	char param[256];
++	char cmd[1024];
++
++	mount_flags_to_string(param, mountflags);
++
++	snprintf(cmd, sizeof (cmd), "%s -o \"%s,%s\" %s %s >/dev/null",
++		 fuse_helper, param, options, source, target);
++
++	return system(cmd);
++}
++
+ static int mount_device(struct blkid_struct_probe *pr, int hotplug)
+ {
+ 	struct mount *m;
+ 	char *device;
++	const char *fstype;
++	const char *fuse = "";
++	int use_fuse = 0;
+ 
+ 	if (!pr)
+ 		return -1;
+ 
++
++	fstype = pr->id->name;
++
++	if (!strcmp(fstype, "ntfs"))
++	{
++		if (fs_has_ufsd)
++		{
++			fstype = "ufsd";
++		}
++		else if (fs_has_ntfs3g)
++		{
++			use_fuse = 1;
++			fuse = "ntfs-3g";
++		}
++	}
++	else if (!strcmp(fstype, "exfat"))
++	{
++		if (!fs_has_exfat)
++		{
++			use_fuse = 1;
++			fuse = "mount.exfat";
++		}
++	}
++
+ 	device = basename(pr->dev);
+ 
+ 	if (!strcmp(pr->id->name, "swap")) {
+@@ -732,11 +825,15 @@
+ 		if (check_fs)
+ 			check_filesystem(pr);
+ 
+-		err = mount(pr->dev, target, pr->id->name, m->flags,
+-		            (m->options) ? (m->options) : (""));
++		if (use_fuse)
++			err = mount_fuse(pr->dev, target, fuse, m->flags,
++					  (m->options) ? (m->options) : (""));
++		else
++			err = mount(pr->dev, target, fstype, m->flags,
++				   (m->options) ? (m->options) : (""));
+ 		if (err)
+ 			ULOG_ERR("mounting %s (%s) as %s failed (%d) - %s\n",
+-			         pr->dev, pr->id->name, target, err, strerror(err));
++			         pr->dev, fstype, target, err, strerror(err));
+ 		else
+ 			handle_swapfiles(true);
+ 		return err;
+@@ -752,10 +849,14 @@
+ 		if (check_fs)
+ 			check_filesystem(pr);
+ 
+-		err = mount(pr->dev, target, pr->id->name, 0, "");
++		if (use_fuse)
++			err = mount_fuse(pr->dev, target, fuse, 0, "");
++		else
++			err = mount(pr->dev, target, fstype, 0, "");
++
+ 		if (err)
+ 			ULOG_ERR("mounting %s (%s) as %s failed (%d) - %s\n",
+-			         pr->dev, pr->id->name, target, err, strerror(err));
++			         pr->dev, fstype, target, err, strerror(err));
+ 		else
+ 			handle_swapfiles(true);
+ 		return err;
+@@ -1400,10 +1501,82 @@
+ 	return 0;
+ }
+ 
++static int procfs_filelength(const char *filename)
++{
++	int fd;
++	int len = 0, ret;
++	char buf[128];
++
++	fd = open(filename, O_RDONLY, 0444);
++
++	if (fd < 0)
++		return -1;
++
++	do
++	{
++		ret = read(fd, buf, sizeof (buf));
++
++		if (ret < 0)
++			break;
++
++		len += ret;
++	} while (ret == sizeof (buf));
++
++	close(fd);
++
++	return len;
++}
++
++static void check_kernel_fs(void)
++{
++	int fd;
++	int len;
++	char *buf, *p;
++
++	fs_has_ufsd = 0;
++	fs_has_exfat = 0;
++	fs_has_ntfs3g = 0;
++
++	len = procfs_filelength("/proc/filesystems");
++
++	fd = open("/proc/filesystems", O_RDONLY, 0444);
++
++	if (fd < 0)
++		return;
++
++	buf = (char *) malloc(len + 1);
++
++	read(fd, buf, len);
++	buf[len] = 0;
++
++	close(fd);
++
++	p = strstr(buf, "ufsd");
++	if (p)
++	{
++		if (p[4] == 0 || p[4] == '\r' || p[4] == '\n' || p[4] == ' ' || p[4] == '\t')
++			fs_has_ufsd = 1;
++	}
++
++	p = strstr(buf, "exfat");
++	if (p)
++	{
++		if (p[5] == 0 || p[5] == '\r' || p[5] == '\n' || p[5] == ' ' || p[5] == '\t')
++			fs_has_exfat = 1;
++	}
++
++	free(buf);
++
++	if (!access("/usr/bin/ntfs-3g", X_OK))
++		fs_has_ntfs3g = 1;
++}
++
+ int main(int argc, char **argv)
+ {
+ 	char *base = basename(*argv);
+ 
++	check_kernel_fs();
++
+ 	umask(0);
+ 
+ 	ulog_open(-1, -1, "block");

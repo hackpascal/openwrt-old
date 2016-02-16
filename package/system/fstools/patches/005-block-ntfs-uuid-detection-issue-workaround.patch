@@ -1,0 +1,26 @@
+--- a/block.c
++++ b/block.c
+@@ -514,17 +514,18 @@
+ 
+ static void cache_load(int mtd)
+ {
+-	if (mtd) {
+-		_cache_load("/dev/mtdblock*");
+-		_cache_load("/dev/ubiblock*");
+-		_cache_load("/dev/ubi?*_?*");
+-	}
+ 	_cache_load("/dev/mmcblk*");
+ 	_cache_load("/dev/sd*");
+ 	_cache_load("/dev/hd*");
+ 	_cache_load("/dev/md*");
+ 	_cache_load("/dev/vd*");
+ 	_cache_load("/dev/mapper/*");
++
++	if (mtd) {
++		_cache_load("/dev/mtdblock*");
++		_cache_load("/dev/ubiblock*");
++		_cache_load("/dev/ubi?*_?*");
++	}
+ }
+ 
+ static int print_block_info(struct blkid_struct_probe *pr)
