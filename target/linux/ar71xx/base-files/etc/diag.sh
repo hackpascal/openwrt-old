@@ -282,7 +282,8 @@ get_status_led() {
 	tl-wa830re-v2 | \
 	tl-wr842n-v2 | \
 	tl-wr941nd | \
-	tl-wr941nd-v5)
+	tl-wr941nd-v5 | \
+	tl-wr941n-v7)
 		status_led="tp-link:green:system"
 		;;
 	archer-c5 | \
