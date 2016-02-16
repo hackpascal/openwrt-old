@@ -1,0 +1,73 @@
+--- a/drivers/mtd/spi-nor/spi-nor.c
++++ b/drivers/mtd/spi-nor/spi-nor.c
+@@ -148,8 +148,10 @@
+ 	case CFI_MFR_ST: /* Micron, actually */
+ 		/* Some Micron need WREN command; all will accept it */
+ 		need_wren = true;
++	case CFI_MFR_EON:
+ 	case CFI_MFR_MACRONIX:
+ 	case 0xEF /* winbond */:
++	case 0xC8 /* GigaDevice */:
+ 		if (need_wren)
+ 			write_enable(nor);
+ 
+@@ -158,12 +160,40 @@
+ 		if (need_wren)
+ 			write_disable(nor);
+ 
+-		return status;
++		break;
+ 	default:
+ 		/* Spansion style */
++		/* ISSI */
+ 		nor->cmd_buf[0] = enable << 7;
+-		return nor->write_reg(nor, SPINOR_OP_BRWR, nor->cmd_buf, 1, 0);
++		status = nor->write_reg(nor, SPINOR_OP_BRWR, nor->cmd_buf, 1, 0);
++	}
++
++	if (enable)
++		return status;
++
++	/* Ensure the highest address byte is 0 while we are in
++	 * 3-byte addressing mode
++	 */
++
++	switch (JEDEC_MFR(jedec_id)) {
++	case CFI_MFR_EON:
++		nor->write_reg(nor, SPINOR_OP_EXHBL, NULL, 0, 0);
++		break;
++	case CFI_MFR_MACRONIX:
++		/* mx25l25655e does not support this command */
++		if (nor->jedec_id == 0xc22619)
++			break;
++	case CFI_MFR_ST: /* Micron, actually */
++	case 0xEF /* winbond */:
++	case 0xC8 /* GigaDevice */:
++		/* Some chips need WREN command; all will accept it */
++		write_enable(nor);
++		nor->cmd_buf[0] = 0;
++		nor->write_reg(nor, SPINOR_OP_WREAR, nor->cmd_buf, 1, 0);
++		write_disable(nor);
+ 	}
++
++	return status;
+ }
+ 
+ static int spi_nor_wait_till_ready(struct spi_nor *nor)
+--- a/include/linux/mtd/spi-nor.h
++++ b/include/linux/mtd/spi-nor.h
+@@ -56,10 +56,14 @@
+ /* Used for Macronix and Winbond flashes. */
+ #define SPINOR_OP_EN4B		0xb7	/* Enter 4-byte mode */
+ #define SPINOR_OP_EX4B		0xe9	/* Exit 4-byte mode */
++#define SPINOR_OP_WREAR		0xc5	/* Write Extended Address Register */
+ 
+ /* Used for Spansion flashes only. */
+ #define SPINOR_OP_BRWR		0x17	/* Bank register write */
+ 
++/* Used for EON flashes only. */
++#define SPINOR_OP_EXHBL		0x98	/* Exit High Bank Latch mode */
++
+ /* Status Register bits. */
+ #define SR_WIP			1	/* Write in progress */
+ #define SR_WEL			2	/* Write enable latch */
