@@ -462,8 +462,6 @@ config wifi-device  wl${i}
 	option channel  ${channel:-11}
 	option txantenna 3
 	option rxantenna 3
-	# REMOVE THIS LINE TO ENABLE WIFI:
-	option disabled 1
 
 config wifi-iface
 	option device   wl${i}

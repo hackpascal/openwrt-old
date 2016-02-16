@@ -114,8 +114,6 @@ config wifi-device  radio$devidx
 	option hwmode	11${mode_band}
 $dev_id
 $ht_capab
-	# REMOVE THIS LINE TO ENABLE WIFI:
-	option disabled 1
 
 config wifi-iface
 	option device   radio$devidx
