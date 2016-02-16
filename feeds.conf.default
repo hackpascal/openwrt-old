@@ -12,4 +12,4 @@ src-git oldpackages http://git.openwrt.org/packages.git
 #src-svn desktop svn://svn.openwrt.org/openwrt/feeds/desktop
 #src-svn xfce svn://svn.openwrt.org/openwrt/feeds/xfce
 #src-svn lxde svn://svn.openwrt.org/openwrt/feeds/lxde
-#src-link custom /usr/src/openwrt/custom-feed
+src-link private /home/hackpascal/openwrt/openwrt-feeds
