@@ -35,7 +35,7 @@ define Package/samba36-server
   CATEGORY:=Network
   TITLE:=Samba 3.6 SMB/CIFS server
   URL:=http://www.samba.org/
-  DEPENDS:=+USE_GLIBC:librt $(ICONV_DEPENDS)
+  DEPENDS:=+USE_GLIBC:librt +libcups $(ICONV_DEPENDS)
 endef
 
 define Package/samba36-client
@@ -90,8 +90,8 @@ CONFIGURE_VARS += \
 CONFIGURE_ARGS += \
 	--exec-prefix=/usr \
 	--prefix=/ \
+	--enable-cups \
 	--disable-avahi \
-	--disable-cups \
 	--disable-pie \
 	--disable-relro \
 	--disable-static \
