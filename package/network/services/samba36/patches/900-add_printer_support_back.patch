@@ -1,0 +1,346 @@
+--- a/source3/librpc/rpc/rpc_common.c
++++ b/source3/librpc/rpc/rpc_common.c
+@@ -123,11 +123,9 @@
+ 	if (!smb_register_ndr_interface(&ndr_table_winreg)) {
+ 		return false;
+ 	}
+-#ifdef PRINTER_SUPPORT
+ 	if (!smb_register_ndr_interface(&ndr_table_spoolss)) {
+ 		return false;
+ 	}
+-#endif
+ #ifdef DFS_SUPPORT
+ 	if (!smb_register_ndr_interface(&ndr_table_netdfs)) {
+ 		return false;
+--- a/source3/printing/spoolssd.c
++++ b/source3/printing/spoolssd.c
+@@ -165,10 +165,6 @@
+ 	NTSTATUS status;
+ 	int ret;
+ 
+-#ifndef PRINTER_SUPPORT
+-	return;
+-#endif
+-
+ 	DEBUG(1, ("Forking SPOOLSS Daemon\n"));
+ 
+ 	pid = sys_fork();
+--- a/source3/rpcclient/rpcclient.c
++++ b/source3/rpcclient/rpcclient.c
+@@ -626,9 +626,7 @@
+ #ifdef SAMR_SUPPORT
+ 	samr_commands,
+ #endif
+-#ifdef PRINTER_SUPPORT
+ 	spoolss_commands,
+-#endif
+ #ifdef NETLOGON_SUPPORT
+ 	netlogon_commands,
+ #endif
+--- a/source3/rpc_server/rpc_ep_setup.c
++++ b/source3/rpc_server/rpc_ep_setup.c
+@@ -1140,10 +1140,6 @@
+ 					   "rpc_server",
+ 					   "spoolss",
+ 					   "embedded");
+-#ifndef PRINTER_SUPPORT
+-	if (1) {
+-	} else
+-#endif
+ 	if (StrCaseCmp(rpcsrv_type, "embedded") == 0) {
+ 		spoolss_cb.init         = spoolss_init_cb;
+ 		spoolss_cb.shutdown     = spoolss_shutdown_cb;
+--- a/source3/rpc_server/svcctl/srv_svcctl_nt.c
++++ b/source3/rpc_server/svcctl/srv_svcctl_nt.c
+@@ -85,11 +85,9 @@
+ 
+ 	/* add builtin services */
+ 
+-#ifdef PRINTER_SUPPORT
+ 	svcctl_ops[i].name = talloc_strdup( svcctl_ops, "Spooler" );
+ 	svcctl_ops[i].ops  = &spoolss_svc_ops;
+ 	i++;
+-#endif
+ 
+ #ifdef NETLOGON_SUPPORT
+ 	svcctl_ops[i].name = talloc_strdup( svcctl_ops, "NETLOGON" );
+--- a/source3/smbd/close.c
++++ b/source3/smbd/close.c
+@@ -643,9 +643,6 @@
+ 	status = ntstatus_keeperror(status, tmp);
+ 
+ 	if (fsp->print_file) {
+-#ifndef PRINTER_SUPPORT
+-		return NT_STATUS_OK;
+-#endif
+ 		/* FIXME: return spool errors */
+ 		print_spool_end(fsp, close_type);
+ 		file_free(req, fsp);
+--- a/source3/smbd/fileio.c
++++ b/source3/smbd/fileio.c
+@@ -298,10 +298,6 @@
+ 		uint32_t t;
+ 		int ret;
+ 
+-#ifndef PRINTER_SUPPORT
+-		return -1;
+-#endif
+-
+ 		ret = print_spool_write(fsp, data, n, pos, &t);
+ 		if (ret) {
+ 			errno = ret;
+--- a/source3/smbd/lanman.c
++++ b/source3/smbd/lanman.c
+@@ -784,10 +784,6 @@
+ 	union spoolss_JobInfo *job_info = NULL;
+ 	union spoolss_PrinterInfo printer_info;
+ 
+-#ifndef PRINTER_SUPPORT
+-	return False;
+-#endif
+-
+ 	if (!str1 || !str2 || !p) {
+ 		return False;
+ 	}
+@@ -1003,10 +999,6 @@
+ 	union spoolss_DriverInfo *driver_info;
+ 	union spoolss_JobInfo **job_info;
+ 
+-#ifndef PRINTER_SUPPORT
+-	return False;
+-#endif
+-
+ 	if (!param_format || !output_format1 || !p) {
+ 		return False;
+ 	}
+@@ -3133,10 +3125,6 @@
+ 	struct spoolss_DevmodeContainer devmode_ctr;
+ 	enum spoolss_JobControl command;
+ 
+-#ifndef PRINTER_SUPPORT
+-	return False;
+-#endif
+-
+ 	if (!str1 || !str2 || !p) {
+ 		return False;
+ 	}
+@@ -3270,10 +3258,6 @@
+ 	struct sec_desc_buf secdesc_ctr;
+ 	enum spoolss_PrinterControl command;
+ 
+-#ifndef PRINTER_SUPPORT
+-	return False;
+-#endif
+-
+ 	if (!str1 || !str2 || !QueueName) {
+ 		return False;
+ 	}
+@@ -3440,10 +3424,6 @@
+ 	union spoolss_JobInfo info;
+ 	struct spoolss_SetJobInfo1 info1;
+ 
+-#ifndef PRINTER_SUPPORT
+-	return False;
+-#endif
+-
+ 	if (!str1 || !str2 || !p) {
+ 		return False;
+ 	}
+@@ -4538,10 +4518,6 @@
+ 	struct spoolss_DevmodeContainer devmode_ctr;
+ 	union spoolss_JobInfo info;
+ 
+-#ifndef PRINTER_SUPPORT
+-	return False;
+-#endif
+-
+ 	if (!str1 || !str2 || !p) {
+ 		return False;
+ 	}
+@@ -4680,10 +4656,6 @@
+ 	uint32_t count = 0;
+ 	union spoolss_JobInfo *info;
+ 
+-#ifndef PRINTER_SUPPORT
+-	return False;
+-#endif
+-
+ 	if (!str1 || !str2 || !p) {
+ 		return False;
+ 	}
+@@ -4889,10 +4861,6 @@
+ 	struct spoolss_DevmodeContainer devmode_ctr;
+ 	union spoolss_PrinterInfo info;
+ 
+-#ifndef PRINTER_SUPPORT
+-	return False;
+-#endif
+-
+ 	if (!str1 || !str2 || !p) {
+ 		return False;
+ 	}
+@@ -5029,10 +4997,6 @@
+ 	union spoolss_PrinterInfo *info;
+ 	uint32_t count;
+ 
+-#ifndef PRINTER_SUPPORT
+-	return False;
+-#endif
+-
+ 	if (!str1 || !str2 || !p) {
+ 		return False;
+ 	}
+@@ -5136,10 +5100,6 @@
+ 	int succnt;
+ 	struct pack_desc desc;
+ 
+-#ifndef PRINTER_SUPPORT
+-	return False;
+-#endif
+-
+ 	if (!str1 || !str2 || !p) {
+ 		return False;
+ 	}
+@@ -5204,10 +5164,6 @@
+ 	int succnt;
+ 	struct pack_desc desc;
+ 
+-#ifndef PRINTER_SUPPORT
+-	return False;
+-#endif
+-
+ 	if (!str1 || !str2 || !p) {
+ 		return False;
+ 	}
+@@ -5272,10 +5228,6 @@
+ 	int succnt;
+ 	struct pack_desc desc;
+ 
+-#ifndef PRINTER_SUPPORT
+-	return False;
+-#endif
+-
+ 	if (!str1 || !str2 || !p) {
+ 		return False;
+ 	}
+--- a/source3/smbd/open.c
++++ b/source3/smbd/open.c
+@@ -1608,9 +1608,6 @@
+ 		 * Most of the passed parameters are ignored.
+ 		 */
+ 
+-#ifndef PRINTER_SUPPORT
+-		return NT_STATUS_ACCESS_DENIED;
+-#endif
+ 		if (pinfo) {
+ 			*pinfo = FILE_WAS_CREATED;
+ 		}
+--- a/source3/smbd/process.c
++++ b/source3/smbd/process.c
+@@ -2423,10 +2423,8 @@
+ 
+ 	change_to_root_user();
+ 
+-#ifdef PRINTER_SUPPORT
+ 	/* update printer queue caches if necessary */
+ 	update_monitored_printq_cache(sconn->msg_ctx);
+-#endif
+ 
+ 	/* check if we need to reload services */
+ 	check_reload(sconn, time_mono(NULL));
+--- a/source3/smbd/reply.c
++++ b/source3/smbd/reply.c
+@@ -5208,11 +5208,7 @@
+ 		return;
+ 	}
+ 
+-
+-#ifdef PRINTER_SUPPORT
+-	if (!CAN_PRINT(conn))
+-#endif
+-	{
++	if (!CAN_PRINT(conn)) {
+ 		reply_nterror(req, NT_STATUS_ACCESS_DENIED);
+ 		END_PROFILE(SMBsplopen);
+ 		return;
+@@ -5318,10 +5314,7 @@
+ 	   is really quite gross and only worked when there was only
+ 	   one printer - I think we should now only accept it if they
+ 	   get it right (tridge) */
+-#ifdef PRINTER_SUPPORT
+-	if (!CAN_PRINT(conn))
+-#endif
+-	{
++	if (!CAN_PRINT(conn)) {
+ 		reply_nterror(req, NT_STATUS_ACCESS_DENIED);
+ 		END_PROFILE(SMBsplretq);
+ 		return;
+--- a/source3/smbd/server.c
++++ b/source3/smbd/server.c
+@@ -123,9 +123,7 @@
+ {
+ 	struct tevent_context *ev_ctx =
+ 		talloc_get_type_abort(private_data, struct tevent_context);
+-#ifndef PRINTER_SUPPORT
+-	return;
+-#endif
++
+ 	DEBUG(10,("Got message saying pcap was updated. Reloading.\n"));
+ 	change_to_root_user();
+ 	reload_printers(ev_ctx, msg);
+@@ -1281,7 +1279,6 @@
+ 	 * The print backend init also migrates the printing tdb's,
+ 	 * this requires a winreg pipe.
+ 	 */
+-#ifdef PRINTER_SUPPORT
+ 	if (!print_backend_init(smbd_messaging_context()))
+ 		exit(1);
+ 
+@@ -1320,7 +1317,7 @@
+ 				       smbd_messaging_context());
+ 		}
+ 	}
+-#endif
++
+ 	if (!is_daemon) {
+ 		/* inetd mode */
+ 		TALLOC_FREE(frame);
+--- a/source3/smbd/server_exit.c
++++ b/source3/smbd/server_exit.c
+@@ -147,9 +147,7 @@
+ 		rpc_svcctl_shutdown();
+ 		rpc_ntsvcs_shutdown();
+ #endif
+-#ifdef PRINTER_SUPPORT
+ 		rpc_spoolss_shutdown();
+-#endif
+ 
+ 		rpc_srvsvc_shutdown();
+ #ifdef WINREG_SUPPORT
+--- a/source3/smbd/smb2_create.c
++++ b/source3/smbd/smb2_create.c
+@@ -486,10 +486,7 @@
+ 		info = FILE_WAS_OPENED;
+ 	} else if (CAN_PRINT(smb1req->conn)) {
+ 		status = file_new(smb1req, smb1req->conn, &result);
+-#ifdef PRINTER_SUPPORT
+-		if(!NT_STATUS_IS_OK(status))
+-#endif
+-		{
++		if(!NT_STATUS_IS_OK(status)) {
+ 			tevent_req_nterror(req, status);
+ 			return tevent_req_post(req, ev);
+ 		}
+--- a/source3/utils/net_rpc.c
++++ b/source3/utils/net_rpc.c
+@@ -7841,10 +7841,6 @@
+ 		{NULL, NULL, 0, NULL, NULL}
+ 	};
+ 
+-#ifndef PRINTER_SUPPORT
+-	return 0;
+-#endif
+-
+ 	if (argc == 0) {
+ 		if (c->display_usage) {
+ 			d_printf(_("Usage:\n"));
