@@ -108,7 +108,7 @@ DEVICE_VARS += TPLINK_HWID TPLINK_HWREV TPLINK_FLASHLAYOUT
 # mkubntimage is using the kernel image direct
 # routerboard creates partitions out of the ubnt header
 define Build/mkubntimage
-	$(STAGING_DIR_HOST)/bin/mkfwimage \
+	-$(STAGING_DIR_HOST)/bin/mkfwimage \
 		-B $(UBNT_BOARD) -v $(UBNT_TYPE).$(UBNT_CHIP).v6.0.0-OpenWrt-$(REVISION) \
 		-k $(word 1,$^) \
 		-r $@ \
@@ -118,18 +118,19 @@ endef
 # all UBNT XM device expect the kernel image to have 1024k while flash, when
 # booting the image, the size doesn't matter.
 define Build/mkubntimage-split
-	dd if=$@ of=$@.old1 bs=1024k count=1
-	dd if=$@ of=$@.old2 bs=1024k skip=1
+	-[ -f $@ ] && ( \
+	dd if=$@ of=$@.old1 bs=1024k count=1; \
+	dd if=$@ of=$@.old2 bs=1024k skip=1; \
 	$(STAGING_DIR_HOST)/bin/mkfwimage \
 		-B $(UBNT_BOARD) -v $(UBNT_TYPE).$(UBNT_CHIP).v6.0.0-OpenWrt-$(REVISION) \
 		-k $@.old1 \
 		-r $@.old2 \
-		-o $@
-	rm $@.old1 $@.old2
+		-o $@; \
+	rm $@.old1 $@.old2 )
 endef
 
 define Build/mkubntimage2
-	$(STAGING_DIR_HOST)/bin/mkfwimage2 -f 0x9f000000 \
+	-$(STAGING_DIR_HOST)/bin/mkfwimage2 -f 0x9f000000 \
 		-v $(UBNT_TYPE).$(UBNT_CHIP).v6.0.0-OpenWrt-$(REVISION) \
 		-p jffs2:0x50000:0xf60000:0:0:$@ \
 		-o $@.new
@@ -139,7 +140,7 @@ endef
 DEVICE_VARS += UBNT_BOARD UBNT_CHIP UBNT_TYPE
 
 define Build/mkubntkernelimage
-	rm -rf $(KDIR_TMP)/ubnt-$(KERNEL_IMAGE)/image && \
+	-rm -rf $(KDIR_TMP)/ubnt-$(KERNEL_IMAGE)/image && \
 		mkdir -p $(KDIR_TMP)/ubnt-$(KERNEL_IMAGE)/image && \
 		cp $@ $(KDIR_TMP)/ubnt-$(KERNEL_IMAGE)/image/kernel0 && \
 		$(STAGING_DIR_HOST)/bin/mkfs.jffs2 \
@@ -2052,18 +2053,18 @@ endef
 
 define Image/Build/CyberTAN
 	echo -n '' > $(KDIR_TMP)/empty.bin
-	$(STAGING_DIR_HOST)/bin/trx -o $(KDIR)/image.tmp \
+	-$(STAGING_DIR_HOST)/bin/trx -o $(KDIR)/image.tmp \
 		-f $(KDIR_TMP)/vmlinux-$(2).uImage -F $(KDIR_TMP)/empty.bin \
-		-x 32 -a 0x10000 -x -32 -f $(KDIR)/root.$(1)
-	-$(STAGING_DIR_HOST)/bin/addpattern -B $(2) -v v$(5) \
+		-x 32 -a 0x10000 -x -32 -f $(KDIR)/root.$(1) && \
+	$(STAGING_DIR_HOST)/bin/addpattern -B $(2) -v v$(5) \
 		-i $(KDIR)/image.tmp \
 		-o $(call sysupname,$(1),$(2))
-	$(STAGING_DIR_HOST)/bin/trx -o $(KDIR)/image.tmp -f $(KDIR_TMP)/vmlinux-$(2).uImage \
-		-x 32 -a 0x10000 -x -32 -f $(KDIR)/root.$(1)
-	-$(STAGING_DIR_HOST)/bin/addpattern -B $(2) -v v$(5) -g \
+	-$(STAGING_DIR_HOST)/bin/trx -o $(KDIR)/image.tmp -f $(KDIR_TMP)/vmlinux-$(2).uImage \
+		-x 32 -a 0x10000 -x -32 -f $(KDIR)/root.$(1) && 
+	$(STAGING_DIR_HOST)/bin/addpattern -B $(2) -v v$(5) -g \
 		-i $(KDIR)/image.tmp \
 		-o $(call factoryname,$(1),$(2))
-	rm $(KDIR)/image.tmp
+	-rm $(KDIR)/image.tmp
 endef
 
 Image/Build/CyberTANGZIP/loader=$(call Image/BuildLoader,$(1),gz,$(2),0x80060000)
