@@ -83,6 +83,34 @@ static struct gpio_led tl_wr740nv5_leds_gpio[] __initdata = {
 	}
 };
 
+static struct gpio_led tl_wr742nv5_leds_gpio[] __initdata = {
+	{
+		.name		= "tp-link:green:lan1",
+		.gpio		= TL_WR740NV5_GPIO_LED_LAN1,
+		.active_low	= 0,
+	}, {
+		.name		= "tp-link:green:lan2",
+		.gpio		= TL_WR740NV5_GPIO_LED_LAN2,
+		.active_low	= 0,
+	}, {
+		.name		= "tp-link:green:lan3",
+		.gpio		= TL_WR740NV5_GPIO_LED_LAN3,
+		.active_low	= 0,
+	}, {
+		.name		= "tp-link:green:lan4",
+		.gpio		= TL_WR740NV5_GPIO_LED_LAN4,
+		.active_low	= 0,
+	}, {
+		.name		= "tp-link:green:wan",
+		.gpio		= TL_WR740NV5_GPIO_LED_WAN,
+		.active_low	= 1,
+	}, {
+		.name		= "tp-link:green:system",
+		.gpio		= TL_WR740NV5_GPIO_LED_WLAN,
+		.active_low	= 0,
+	}
+};
+
 static struct gpio_keys_button tl_wr740nv5_gpio_keys[] __initdata = {
 	{
 		.desc		= "reset",
@@ -139,8 +167,8 @@ static void __init tl_wr742nv5_setup(void)
 {
 	tl_ap121_setup();
 
-	ath79_register_leds_gpio(-1, ARRAY_SIZE(tl_wr740nv5_leds_gpio) - 2,
-				 tl_wr740nv5_leds_gpio);
+	ath79_register_leds_gpio(-1, ARRAY_SIZE(tl_wr742nv5_leds_gpio),
+				 tl_wr742nv5_leds_gpio);
 }
 
 MIPS_MACHINE(ATH79_MACH_TL_WR742N_V5, "TL-WR742N-v5",
