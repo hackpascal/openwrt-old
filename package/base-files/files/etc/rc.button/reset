@@ -11,11 +11,13 @@ timeout)
 	set_state failsafe
 ;;
 released)
-	if [ "$SEEN" -lt 1 ]
+	if [ "$SEEN" -lt 2 ]
 	then
-		echo "REBOOT" > /dev/console
-		sync
-		reboot
+		cd /var/run/hostapd
+		for socket in *; do
+			[ -S "$socket" ] || continue
+			hostapd_cli -i "$socket" wps_pbc
+		done
 	elif [ "$SEEN" -gt 5 ]
 	then
 		echo "FACTORY RESET" > /dev/console
