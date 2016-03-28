@@ -1,0 +1,141 @@
+--- a/api/madwifi.h
++++ b/api/madwifi.h
+@@ -97,6 +97,9 @@
+ 	IEEE80211_AUTH_AUTO	= 4,	/* auto-select/accept */
+ 	/* NB: these are used only for ioctls */
+ 	IEEE80211_AUTH_WPA	= 5,	/* WPA/RSN w/ 802.1x/PSK */
++	IEEE80211_AUTH_RSNA     = 6,	/* WPA2/RSNA */
++	IEEE80211_AUTH_CCKM     = 7,	/* CCK */
++	IEEE80211_AUTH_WAPI     = 8,	/* WAPI */
+ };
+ 
+ struct ieee80211_channel {
+--- a/include/iwinfo.h
++++ b/include/iwinfo.h
+@@ -37,10 +37,12 @@
+ #define IWINFO_CIPHER_WEP104 (1 << 5)
+ #define IWINFO_CIPHER_AESOCB (1 << 6)
+ #define IWINFO_CIPHER_CKIP   (1 << 7)
++#define IWINFO_CIPHER_WAPI   (1 << 8)
+ 
+ #define IWINFO_KMGMT_NONE    (1 << 0)
+ #define IWINFO_KMGMT_8021x   (1 << 1)
+ #define IWINFO_KMGMT_PSK     (1 << 2)
++#define IWINFO_KMGMT_WAPI    (1 << 3)
+ 
+ #define IWINFO_AUTH_OPEN     (1 << 0)
+ #define IWINFO_AUTH_SHARED   (1 << 1)
+@@ -124,8 +126,8 @@
+ struct iwinfo_crypto_entry {
+ 	uint8_t	enabled;
+ 	uint8_t wpa_version;
+-	uint8_t group_ciphers;
+-	uint8_t pair_ciphers;
++	uint16_t group_ciphers;
++	uint16_t pair_ciphers;
+ 	uint8_t auth_suites;
+ 	uint8_t auth_algs;
+ };
+--- a/iwinfo_cli.c
++++ b/iwinfo_cli.c
+@@ -223,6 +223,13 @@
+ 				snprintf(buf, sizeof(buf), "WEP Shared Auth (%s)",
+ 					format_enc_ciphers(c->pair_ciphers));
+ 			}
++
++			/* WAPI */
++			else if ((c->auth_algs & IWINFO_KMGMT_WAPI) || 
++				(c->group_ciphers & IWINFO_CIPHER_WAPI))
++			{
++				snprintf(buf, sizeof(buf), "WAPI");
++			}
+ 		}
+ 
+ 		/* WPA */
+--- a/iwinfo_lib.c
++++ b/iwinfo_lib.c
+@@ -31,12 +31,14 @@
+ 	"WEP104",
+ 	"AES-OCB",
+ 	"CKIP",
++	"WAPI",
+ };
+ 
+ const char *IWINFO_KMGMT_NAMES[] = {
+ 	"NONE",
+ 	"802.1X",
+ 	"PSK",
++	"WAPI",
+ };
+ 
+ const char *IWINFO_AUTH_NAMES[] = {
+--- a/iwinfo_lua.c
++++ b/iwinfo_lua.c
+@@ -70,6 +70,9 @@
+ 	if (ciphers & IWINFO_CIPHER_CKIP)
+ 		pos += sprintf(pos, "CKIP, ");
+ 
++	if (ciphers & IWINFO_CIPHER_WAPI)
++		pos += sprintf(pos, "WAPI, ");
++
+ 	if (!ciphers || (ciphers & IWINFO_CIPHER_NONE))
+ 		pos += sprintf(pos, "NONE, ");
+ 
+@@ -124,6 +127,13 @@
+ 					sprintf(desc, "WEP Shared Auth (%s)",
+ 						iwinfo_crypto_print_ciphers(c->pair_ciphers));
+ 				}
++
++				/* WAPI */
++				else if ((c->auth_algs & IWINFO_KMGMT_WAPI) || 
++					(c->group_ciphers & IWINFO_CIPHER_WAPI))
++				{
++					sprintf(desc, "WAPI");
++				}
+ 			}
+ 
+ 			/* WPA */
+--- a/iwinfo_qcawifi.c
++++ b/iwinfo_qcawifi.c
+@@ -598,6 +598,10 @@
+ 				c->auth_algs |= IWINFO_AUTH_SHARED;
+ 				break;
+ 
++			case IEEE80211_AUTH_WAPI:
++				c->auth_algs |= IWINFO_KMGMT_WAPI;
++				break;
++
+ 			default:
+ 				c->auth_suites |= IWINFO_KMGMT_NONE;
+ 				break;
+@@ -664,6 +668,9 @@
+ 	{
+ 		ciphers = c->wpa_version ? wrq.u.mode : IEEE80211_CIPHER_WEP;
+ 
++		if (wrq.u.mode == IEEE80211_CIPHER_WAPI)
++			ciphers = wrq.u.mode;
++
+ 		switch(ciphers) {
+ 			case IEEE80211_CIPHER_TKIP:
+ 				c->group_ciphers |= IWINFO_CIPHER_TKIP;
+@@ -696,6 +703,10 @@
+ 				}
+ 				break;
+ 
++			case IEEE80211_CIPHER_WAPI:
++				c->group_ciphers |= IWINFO_CIPHER_WAPI;
++				break;
++
+ 			case IEEE80211_CIPHER_NONE:
+ 				c->group_ciphers |= IWINFO_CIPHER_NONE;
+ 				break;
+@@ -707,6 +718,9 @@
+ 
+ 	c->enabled = (c->wpa_version || (c->auth_algs && c->pair_ciphers)) ? 1 : 0;
+ 
++	if ((c->auth_algs & IWINFO_KMGMT_WAPI) || (c->group_ciphers & IWINFO_CIPHER_WAPI))
++		c->enabled = 1;
++
+ 	return 0;
+ }
+ 
