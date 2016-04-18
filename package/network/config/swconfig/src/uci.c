@@ -42,6 +42,7 @@ struct swlib_setting {
 	const char *name;
 	int port_vlan;
 	const char *val;
+	struct switch_ext *ext_val;
 	struct swlib_setting *next;
 };
 
@@ -103,6 +104,68 @@ swlib_map_settings(struct switch_dev *dev, int type, int port_vlan, struct uci_s
 skip:
 		continue;
 	}
+}
+
+static int
+swlib_map_ext_attr_settings(struct switch_dev *dev, int type, int port_vlan, struct uci_section *s)
+{
+	struct swlib_setting *setting;
+	struct switch_attr *attr;
+	struct uci_element *e;
+	struct uci_option *o;
+	struct switch_ext *switch_ext_p, *switch_ext_tmp;
+	int i;
+
+	attr = swlib_lookup_attr(dev, SWLIB_ATTR_GROUP_GLOBAL, s->type);
+	if (!attr)
+		return 0;
+
+	setting = malloc(sizeof(struct swlib_setting));
+	memset(setting, 0, sizeof(struct swlib_setting));
+	setting->attr = attr;
+	setting->port_vlan = port_vlan;
+	switch_ext_p = setting->ext_val;
+
+	uci_foreach_element(&s->options, e) {
+		o = uci_to_option(e);
+
+		if (o->type != UCI_TYPE_STRING)
+			continue;
+
+		if (!strcmp(e->name, "device"))
+			continue;
+
+		/* map early settings */
+		if (type == SWLIB_ATTR_GROUP_GLOBAL) {
+			int i;
+
+			for (i = 0; i < ARRAY_SIZE(early_settings); i++) {
+				if (strcmp(e->name, early_settings[i].name) != 0)
+					continue;
+
+				early_settings[i].val = o->v.string;
+				goto skip;
+			}
+		}
+
+		switch_ext_tmp = malloc(sizeof(struct switch_ext));
+		memset(switch_ext_tmp, 0, sizeof(struct switch_ext));
+		switch_ext_tmp->option_name = e->name;
+		switch_ext_tmp->option_value = o->v.string;
+		if(!switch_ext_p) {
+			setting->ext_val = switch_ext_tmp;
+		} else {
+			switch_ext_p->next = switch_ext_tmp;
+		}
+		switch_ext_p = switch_ext_tmp;
+
+skip:
+		continue;
+	}
+
+	setting->val = (char *)setting->ext_val;
+	*head = setting;
+	head = &setting->next;
 }
 
 int swlib_apply_from_uci(struct switch_dev *dev, struct uci_package *p)
@@ -214,6 +277,8 @@ found:
 				continue;
 
 			swlib_map_settings(dev, SWLIB_ATTR_GROUP_VLAN, vlan_n, s);
+		} else if (!strcmp(s->type, "switch_ext")) {
+			swlib_map_ext_attr_settings(dev, SWLIB_ATTR_GROUP_GLOBAL, 0, s);
 		}
 	}
 
@@ -227,9 +292,15 @@ found:
 
 	while (settings) {
 		struct swlib_setting *st = settings;
+		struct switch_ext *switch_ext_p = settings->ext_val;
 
 		swlib_set_attr_string(dev, st->attr, st->port_vlan, st->val);
 		st = st->next;
+		while (switch_ext_p) {
+			struct switch_ext *ext_value_p = switch_ext_p;
+			switch_ext_p = switch_ext_p->next;
+			free(ext_value_p);
+		}
 		free(settings);
 		settings = st;
 	}

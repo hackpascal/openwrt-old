@@ -110,6 +110,7 @@ struct switch_dev;
 struct switch_attr;
 struct switch_port;
 struct switch_port_map;
+struct switch_ext;
 struct switch_val;
 struct uci_package;
 
@@ -138,6 +139,7 @@ struct switch_val {
 		char *s;
 		int i;
 		struct switch_port *ports;
+		struct switch_ext *ext_val;
 	} value;
 };
 
@@ -159,6 +161,12 @@ struct switch_port {
 struct switch_portmap {
 	unsigned int virt;
 	char *segment;
+};
+
+struct switch_ext {
+	const char *option_name;
+	const char *option_value;
+	struct switch_ext *next;
 };
 
 /**
