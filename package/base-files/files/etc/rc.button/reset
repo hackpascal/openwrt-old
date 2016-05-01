@@ -13,11 +13,7 @@ timeout)
 released)
 	if [ "$SEEN" -lt 2 ]
 	then
-		cd /var/run/hostapd
-		for socket in *; do
-			[ -S "$socket" ] || continue
-			hostapd_cli -i "$socket" wps_pbc
-		done
+		BUTTON=wps ACTION=pressed /etc/rc.button/wps
 	elif [ "$SEEN" -gt 5 ]
 	then
 		echo "FACTORY RESET" > /dev/console
