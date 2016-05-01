@@ -23,6 +23,9 @@ PKG_CONFIG_DEPENDS := \
 	CONFIG_PACKAGE_kmod-brcm-wl-mini \
 	CONFIG_PACKAGE_kmod-brcm-wl-mimo \
 	CONFIG_PACKAGE_kmod-madwifi \
+	CONFIG_PACKAGE_kmod-qca-wifi-akronite-perf \
+	CONFIG_PACKAGE_kmod-qca-wifi-ar9100-perf \
+	CONFIG_PACKAGE_kmod-qca-wifi-perf \
 	CONFIG_PACKAGE_kmod-cfg80211
 
 include $(INCLUDE_DIR)/package.mk
@@ -71,13 +74,25 @@ endef
 define Build/Configure
 endef
 
+ifneq ($(CONFIG_PACKAGE_kmod-qca-wifi-akronite-perf),)
+  IWINFO_QCAWIFI:=y
+endif
+
+ifneq ($(CONFIG_PACKAGE_kmod-qca-wifi-ar9100-perf),)
+  IWINFO_QCAWIFI:=y
+endif
+
+ifneq ($(CONFIG_PACKAGE_kmod-qca-wifi-perf),)
+  IWINFO_QCAWIFI:=y
+endif
+
 IWINFO_BACKENDS := \
 	$(if $(CONFIG_PACKAGE_kmod-brcm-wl),wl) \
 	$(if $(CONFIG_PACKAGE_kmod-brcm-wl-mini),wl) \
 	$(if $(CONFIG_PACKAGE_kmod-brcm-wl-mimo),wl) \
 	$(if $(CONFIG_PACKAGE_kmod-madwifi),madwifi) \
 	$(if $(CONFIG_PACKAGE_kmod-cfg80211),nl80211) \
-	$(if $(CONFIG_PACKAGE_kmod-qca-wifi-perf),qcawifi)
+	$(if $(IWINFO_QCAWIFI),qcawifi)
 
 TARGET_CFLAGS += \
 	-I$(STAGING_DIR)/usr/include/libnl-tiny \
