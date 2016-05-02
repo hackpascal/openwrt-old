@@ -621,7 +621,7 @@ static int check_options(void)
 {
 	int ret;
 	int exceed_bytes;
-	uint32_t expect_size;
+	uint32_t expect_size, layout_reserved_size;
 
 	if (inspect_info.file_name) {
 		ret = get_file_stat(&inspect_info);
@@ -724,9 +724,10 @@ static int check_options(void)
 
 			exceed_bytes = kernel_len + rootfs_info.file_size - (fw_max_len - sizeof(struct fw_header));
 			if (exceed_bytes > 0) {
-				expect_size = bits_align(kernel_len + rootfs_info.file_size + sizeof(struct fw_header));
+				layout_reserved_size = bits_align(layout->fw_max_len) - layout->fw_max_len;
+				expect_size = bits_align(kernel_len + rootfs_info.file_size + sizeof(struct fw_header) + reserved_space + layout_reserved_size);
 				if (expect_size <= 0x1000000) {
-					layout->fw_max_len = expect_size - (bits_align(layout->fw_max_len) - layout->fw_max_len);
+					layout->fw_max_len = expect_size - layout_reserved_size;
 					fw_max_len = layout->fw_max_len - reserved_space;
 					exceed_bytes = kernel_len + rootfs_info.file_size - (fw_max_len - sizeof(struct fw_header));
 					if (exceed_bytes > 0)
