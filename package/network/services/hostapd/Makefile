@@ -68,14 +68,17 @@ endif
 
 ifneq ($(CONFIG_PACKAGE_kmod-qca-wifi-akronite-perf),)
   HOSTAPD_ATHR:=y
+  DRV_ATHR_DEPENDS:=+PACKAGE_kmod-qca-wifi-akronite-perf:libnl-tiny
 endif
 
 ifneq ($(CONFIG_PACKAGE_kmod-qca-wifi-ar9100-perf),)
   HOSTAPD_ATHR:=y
+  DRV_ATHR_DEPENDS:=+PACKAGE_kmod-qca-wifi-ar9100-perf:libnl-tiny
 endif
 
 ifneq ($(CONFIG_PACKAGE_kmod-qca-wifi-perf),)
   HOSTAPD_ATHR:=y
+  DRV_ATHR_DEPENDS:=+PACKAGE_kmod-qca-wifi-perf:libnl-tiny
 endif
 
 DRIVER_MAKEOPTS= \
@@ -116,7 +119,7 @@ ifdef CONFIG_USE_GLIBC
   TARGET_LDFLAGS_C += -lrt
 endif
 
-DRV_DEPENDS:=+PACKAGE_kmod-cfg80211:libnl-tiny
+DRV_DEPENDS:=+PACKAGE_kmod-cfg80211:libnl-tiny $(DRV_ATHR_DEPENDS)
 
 define Package/hostapd/Default
   SECTION:=net
