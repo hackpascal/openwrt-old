@@ -5,8 +5,8 @@
 +#include <ctype.h>
  #include <sys/utsname.h>
  
- #include "superblocks.h"
-@@ -152,6 +153,61 @@
+ #include "libblkid-tiny.h"
+@@ -153,6 +154,61 @@
  	return 0;
  }
  
@@ -70,11 +70,11 @@
  	&vfat_idinfo,
 --- a/libblkid-tiny/superblocks.h
 +++ b/libblkid-tiny/superblocks.h
-@@ -88,5 +88,7 @@
- extern int blkid_probe_set_uuid(blkid_probe pr, unsigned char *uuid);
- extern int blkid_probe_set_uuid_as(blkid_probe pr, unsigned char *uuid, const char *name);
+@@ -100,4 +100,7 @@
+ extern int blkid_probe_set_utf8_id_label(blkid_probe pr, const char *name,
+ 			     unsigned char *data, size_t len, int enc);
  
 +extern size_t blkid_encode_to_utf8(int enc, unsigned char *dest, size_t len,
 +			const unsigned char *src, size_t count);
- 
++
  #endif /* _BLKID_SUPERBLOCKS_H */

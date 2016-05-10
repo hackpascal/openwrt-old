@@ -1,17 +1,35 @@
 --- a/drivers/mtd/spi-nor/spi-nor.c
 +++ b/drivers/mtd/spi-nor/spi-nor.c
-@@ -180,8 +180,10 @@
- 	case CFI_MFR_ST: /* Micron, actually */
+@@ -187,28 +187,67 @@
+ {
+ 	int status;
+ 	bool need_wren = false;
+-	u8 cmd;
++	u8 cmd, sr3;
+ 
+ 	switch (JEDEC_MFR(info)) {
+ 	case SNOR_MFR_MICRON:
  		/* Some Micron need WREN command; all will accept it */
  		need_wren = true;
-+	case CFI_MFR_EON:
- 	case CFI_MFR_MACRONIX:
- 	case 0xEF /* winbond */:
-+	case 0xC8 /* GigaDevice */:
++	case SNOR_MFR_EON:
+ 	case SNOR_MFR_MACRONIX:
+ 	case SNOR_MFR_WINBOND:
++	case SNOR_MFR_GIGADEVICE:
  		if (need_wren)
  			write_enable(nor);
  
-@@ -190,12 +192,39 @@
++		/* Check ADP bit in SR3 of Winbond flashes */
++		if ((!enable) && (JEDEC_MFR(info) == SNOR_MFR_WINBOND)) {
++			if (!nor->read_reg(nor, SPINOR_OP_RDSR3, &sr3, 1)) {
++				if (sr3 & SR3_ADP) {
++					/* Force to enable 4byte mode */
++					enable = 1;
++				}
++			}
++		}
++
+ 		cmd = enable ? SPINOR_OP_EN4B : SPINOR_OP_EX4B;
+ 		status = nor->write_reg(nor, cmd, NULL, 0);
  		if (need_wren)
  			write_disable(nor);
  
@@ -20,9 +38,9 @@
  	default:
  		/* Spansion style */
  		nor->cmd_buf[0] = enable << 7;
--		return nor->write_reg(nor, SPINOR_OP_BRWR, nor->cmd_buf, 1, 0);
-+		status = nor->write_reg(nor, SPINOR_OP_BRWR, nor->cmd_buf, 1, 0);
-+	}
+-		return nor->write_reg(nor, SPINOR_OP_BRWR, nor->cmd_buf, 1);
++		status = nor->write_reg(nor, SPINOR_OP_BRWR, nor->cmd_buf, 1);
+ 	}
 +
 +	if (enable)
 +		return status;
@@ -32,22 +50,22 @@
 +	 */
 +
 +	switch (JEDEC_MFR(info)) {
-+	case CFI_MFR_EON:
-+		nor->write_reg(nor, SPINOR_OP_EXHBL, NULL, 0, 0);
++	case SNOR_MFR_EON:
++		nor->write_reg(nor, SPINOR_OP_EXHBL, NULL, 0);
 +		break;
-+	case CFI_MFR_MACRONIX:
++	case SNOR_MFR_MACRONIX:
 +		/* mx25l25655e does not support this command */
 +		if ((info->id[1] == 0x26) && (info->id[2] == 0x19))
 +			break;
-+	case CFI_MFR_ST: /* Micron, actually */
-+	case 0xEF /* winbond */:
-+	case 0xC8 /* GigaDevice */:
++	case SNOR_MFR_MICRON:
++	case SNOR_MFR_WINBOND:
++	case SNOR_MFR_GIGADEVICE:
 +		/* Some chips need WREN command; all will accept it */
 +		write_enable(nor);
 +		nor->cmd_buf[0] = 0;
-+		nor->write_reg(nor, SPINOR_OP_WREAR, nor->cmd_buf, 1, 0);
++		nor->write_reg(nor, SPINOR_OP_WREAR, nor->cmd_buf, 1);
 +		write_disable(nor);
- 	}
++ 	}
 +
 +	return status;
  }
@@ -55,7 +73,17 @@
  {
 --- a/include/linux/mtd/spi-nor.h
 +++ b/include/linux/mtd/spi-nor.h
-@@ -56,6 +56,7 @@
+@@ -26,7 +26,9 @@
+ #define SNOR_MFR_MACRONIX	CFI_MFR_MACRONIX
+ #define SNOR_MFR_SPANSION	CFI_MFR_AMD
+ #define SNOR_MFR_SST		CFI_MFR_SST
++#define SNOR_MFR_EON		CFI_MFR_EON
+ #define SNOR_MFR_WINBOND	0xef
++#define SNOR_MFR_GIGADEVICE	0xc8
+ 
+ /*
+  * Note on opcode nomenclature: some opcodes have a format like
+@@ -74,6 +76,7 @@
  /* Used for Macronix and Winbond flashes. */
  #define SPINOR_OP_EN4B		0xb7	/* Enter 4-byte mode */
  #define SPINOR_OP_EX4B		0xe9	/* Exit 4-byte mode */
@@ -63,13 +91,19 @@
  
  /* Used for Spansion flashes only. */
  #define SPINOR_OP_BRWR		0x17	/* Bank register write */
-@@ -64,6 +65,9 @@
+@@ -82,6 +85,15 @@
  #define SPINOR_OP_RD_EVCR      0x65    /* Read EVCR register */
  #define SPINOR_OP_WD_EVCR      0x61    /* Write EVCR register */
  
 +/* Used for EON flashes only. */
 +#define SPINOR_OP_EXHBL		0x98	/* Exit High Bank Latch mode */
 +
++/* Used for Winbond flashes only. */
++#define SPINOR_OP_RDSR3		0x15	/* Read status register - 3 */
++
++/* Winbond Status Register - 3 bits. */
++#define SR3_ADP			BIT(1)	/* Power-Up address mode */
++
  /* Status Register bits. */
- #define SR_WIP			1	/* Write in progress */
- #define SR_WEL			2	/* Write enable latch */
+ #define SR_WIP			BIT(0)	/* Write in progress */
+ #define SR_WEL			BIT(1)	/* Write enable latch */

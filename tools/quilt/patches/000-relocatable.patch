@@ -7,10 +7,10 @@
 -export TEXTDOMAINDIR=@LOCALEDIR@
  
 -: ${QUILT_DIR=@QUILT_DIR@}
-+if test -n "$STAGING_DIR"; then
-+	export TEXTDOMAINDIR="$STAGING_DIR/../host/share/locale"
-+	: ${QUILT_DIR=$STAGING_DIR/../host/share/quilt} ${QUILT_LIB=$STAGING_DIR/../host/lib/quilt}
-+	: ${QUILT_ETC=$STAGING_DIR/../host/etc}
++if test -n "$STAGING_DIR_HOST"; then
++	export TEXTDOMAINDIR="$STAGING_DIR_HOST/share/locale"
++	: ${QUILT_DIR=$STAGING_DIR_HOST/share/quilt} ${QUILT_LIB=$STAGING_DIR_HOST/lib/quilt}
++	: ${QUILT_ETC=$STAGING_DIR_HOST/etc}
 +else
 +	export TEXTDOMAINDIR=@LOCALEDIR@
 +	: ${QUILT_DIR=@QUILT_DIR@}
@@ -28,30 +28,23 @@
  	export QUILTRC
 --- a/quilt/scripts/edmail.in
 +++ b/quilt/scripts/edmail.in
-@@ -29,7 +29,7 @@ BEGIN {
+@@ -1,4 +1,6 @@
+-#! @PERL@ -w
++#! @PERL@
++
++use warnings;
+ 
+ # RFCs important for this script:
+ #
+@@ -29,7 +31,7 @@ BEGIN {
  }
  
  setlocale(LC_MESSAGES, "");
 -bindtextdomain("quilt", "@LOCALEDIR@");
-+bindtextdomain("quilt", $ENV{'STAGING_DIR'} ? $ENV{'STAGING_DIR'} . '/../host/share/locale' : "@LOCALEDIR@");
++bindtextdomain("quilt", $ENV{'STAGING_DIR_HOST'} ? $ENV{'STAGING_DIR_HOST'} . '/share/locale' : "@LOCALEDIR@");
  textdomain("quilt");
  
  sub _($) {
---- a/quilt/scripts/inspect.in
-+++ b/quilt/scripts/inspect.in
-@@ -6,7 +6,11 @@
- #
- #  See the COPYING and AUTHORS files for more details.
- 
--: ${QUILT_DIR=@QUILT_DIR@}
-+if test -n "$STAGING_DIR"; then
-+	: ${QUILT_DIR="$STAGING_DIR/../host/share/quilt"}
-+else
-+	: ${QUILT_DIR=@QUILT_DIR@}
-+fi
- 
- if ! [ -r $QUILT_DIR/scripts/patchfns ]
- then
 --- a/quilt/scripts/patchfns.in
 +++ b/quilt/scripts/patchfns.in
 @@ -8,7 +8,11 @@
@@ -59,8 +52,8 @@
  
  export TEXTDOMAIN=quilt
 -export TEXTDOMAINDIR=@LOCALEDIR@
-+if [ -n "$STAGING_DIR" ]; then
-+	export TEXTDOMAINDIR="$STAGING_DIR/../host/share/locale"
++if [ -n "$STAGING_DIR_HOST" ]; then
++	export TEXTDOMAINDIR="$STAGING_DIR_HOST/share/locale"
 +else
 +	export TEXTDOMAINDIR=@LOCALEDIR@
 +fi
@@ -69,12 +62,20 @@
  : ${LC_MESSAGES:=$LANG}
 --- a/quilt/scripts/remove-trailing-ws.in
 +++ b/quilt/scripts/remove-trailing-ws.in
-@@ -31,7 +31,7 @@ BEGIN {
+@@ -1,4 +1,6 @@
+-#! @PERL@ -w
++#! @PERL@
++
++use warnings;
+ 
+ # Remove trailing whitespace from modified lines in working files.
+ #
+@@ -31,7 +33,7 @@ BEGIN {
  }
  
  setlocale(LC_MESSAGES, "");
 -bindtextdomain("quilt", "@LOCALEDIR@");
-+bindtextdomain("quilt", $ENV{'STAGING_DIR'} ? $ENV{'STAGING_DIR'} . '/../host/share/locale' : "@LOCALEDIR@");
++bindtextdomain("quilt", $ENV{'STAGING_DIR_HOST'} ? $ENV{'STAGING_DIR_HOST'} . '/share/locale' : "@LOCALEDIR@");
  textdomain("quilt");
  
  sub _($) {
@@ -100,7 +101,7 @@
  MKTEMP :=	@MKTEMP@
  MSGMERGE :=	@MSGMERGE@
  MSGFMT :=	@MSGFMT@
-@@ -49,8 +49,8 @@ USE_NLS :=	@USE_NLS@
+@@ -48,8 +48,8 @@ USE_NLS :=	@USE_NLS@
  STAT_HARDLINK := @STAT_HARDLINK@
  PATCH_WRAPPER := @PATCH_WRAPPER@
  
@@ -118,8 +119,8 @@
  }
  
 -: ${QUILT_DIR=@QUILT_DIR@}
-+if test -n "$STAGING_DIR"; then
-+	: ${QUILT_DIR="$STAGING_DIR/../host/share/quilt"}
++if test -n "$STAGING_DIR_HOST"; then
++	: ${QUILT_DIR="$STAGING_DIR_HOST/share/quilt"}
 +else
 +	: ${QUILT_DIR=@QUILT_DIR@}
 +fi
@@ -127,3 +128,43 @@
  . $QUILT_DIR/scripts/utilfns
  
  ensure_nolinks()
+--- a/bin/guards.in
++++ b/bin/guards.in
+@@ -1,4 +1,6 @@
+-#!@PERL@ -w
++#!@PERL@
++
++use warnings;
+ 
+ #  This script is free software; you can redistribute it and/or modify
+ #  it under the terms of the GNU General Public License version 2 as
+--- a/compat/date.in
++++ b/compat/date.in
+@@ -1,4 +1,6 @@
+-#! @PERL@ -w
++#! @PERL@
++
++use warnings;
+ 
+ #  This script is free software; you can redistribute it and/or modify
+ #  it under the terms of the GNU General Public License version 2 as
+--- a/compat/getopt.in
++++ b/compat/getopt.in
+@@ -1,4 +1,6 @@
+-#! @PERL@ -w
++#! @PERL@
++
++use warnings;
+ 
+ #  This script is free software; you can redistribute it and/or modify
+ #  it under the terms of the GNU General Public License version 2 as
+--- a/quilt/scripts/dependency-graph.in
++++ b/quilt/scripts/dependency-graph.in
+@@ -1,4 +1,6 @@
+-#!@PERL@ -w
++#!@PERL@
++
++use warnings;
+ 
+ #  This script is free software; you can redistribute it and/or modify
+ #  it under the terms of the GNU General Public License version 2 as

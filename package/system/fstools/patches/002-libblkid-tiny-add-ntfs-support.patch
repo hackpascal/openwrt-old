@@ -1,19 +1,19 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -28,6 +28,7 @@
- 		libblkid-tiny/ubifs.c
+@@ -29,6 +29,7 @@
  		libblkid-tiny/squashfs.c
  		libblkid-tiny/btrfs.c
+ 		libblkid-tiny/f2fs.c
 +		libblkid-tiny/ntfs.c
  		)
  INSTALL(TARGETS blkid-tiny LIBRARY DESTINATION lib)
  
 --- a/libblkid-tiny/libblkid-tiny.c
 +++ b/libblkid-tiny/libblkid-tiny.c
-@@ -224,6 +224,7 @@
- 	&hfsplus_idinfo,
+@@ -226,6 +226,7 @@
  	&hfs_idinfo,
  	&btrfs_idinfo,
+ 	&f2fs_idinfo,
 +	&ntfs_idinfo,
  };
  

@@ -42,13 +42,15 @@ endef
 
 define Device/Default
 	PROFILES := Default
+	KERNEL_DEPENDS = $$(wildcard $(DTS_DIR)/$$(DEVICE_DTS).dts)
 	KERNEL_INITRAMFS_PREFIX := $$(IMG_PREFIX)-$(1)-initramfs
 	DEVICE_DTS :=
 	KERNEL_PREFIX := $$(IMAGE_PREFIX)
 	IMAGES :=
 	KERNEL_IN_UBI :=
+	BOARD_NAME :=
 endef
-DEVICE_VARS += DEVICE_DTS KERNEL_IN_UBI
+DEVICE_VARS += DEVICE_DTS KERNEL_IN_UBI BOARD_NAME
 
 define Device/LegacyImage
 	KERNEL_SUFFIX := -uImage
@@ -78,12 +80,11 @@ define Device/DniImage
 	KERNEL_NAME := zImage
 	NETGEAR_BOARD_ID :=
 	NETGEAR_HW_ID :=
-	BOARD_NAME :=
 	IMAGES := factory.img sysupgrade.tar
 	IMAGE/factory.img := append-kernel | append-ubi | netgear-dni
 	IMAGE/sysupgrade.tar = sysupgrade-nand
 endef
-DEVICE_VARS += KERNEL_SIZE NETGEAR_BOARD_ID NETGEAR_HW_ID DEVICE_BLOCK_SIZE DEVICE_PAGE_SIZE BOARD_NAME
+DEVICE_VARS += KERNEL_SIZE NETGEAR_BOARD_ID NETGEAR_HW_ID DEVICE_BLOCK_SIZE DEVICE_PAGE_SIZE
 
 define Device/AP148
 	$(call Device/FitImage)
@@ -91,6 +92,7 @@ define Device/AP148
 	DEVICE_DTS := qcom-ipq8064-ap148
 	BLOCKSIZE := 128KiB
 	PAGESIZE := 2048
+	BOARD_NAME := ap148
 endef
 
 define Device/AP148-legacy
@@ -99,13 +101,25 @@ define Device/AP148-legacy
 	DEVICE_DTS := qcom-ipq8064-ap148
 	BLOCKSIZE := 128KiB
 	PAGESIZE := 2048
-	BOARD_NAME := AP148
+	BOARD_NAME := ap148
+endef
+
+define Device/D7800
+	$(call Device/DniImage)
+	DEVICE_DTS := qcom-ipq8064-d7800
+	KERNEL_SIZE := 2097152
+	NETGEAR_BOARD_ID := D7800
+	NETGEAR_HW_ID := 29764958+0+128+512+4x4+4x4
+	BLOCKSIZE := 128KiB
+	PAGESIZE := 2048
+	BOARD_NAME := d7800
 endef
 
 define Device/DB149
 	$(call Device/FitImage)
 	DEVICE_DTS := qcom-ipq8064-db149
 	KERNEL_INSTALL := 1
+	BOARD_NAME := db149
 endef
 
 define Device/R7500
@@ -119,6 +133,6 @@ define Device/R7500
 	BOARD_NAME := r7500
 endef
 
-TARGET_DEVICES += AP148 AP148-legacy DB149 R7500
+TARGET_DEVICES += AP148 AP148-legacy D7800 DB149 R7500
 
 $(eval $(call BuildImage))

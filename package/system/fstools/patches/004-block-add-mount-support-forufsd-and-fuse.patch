@@ -165,7 +165,7 @@
  		else
  			handle_swapfiles(true);
  		return err;
-@@ -1400,10 +1501,82 @@
+@@ -1401,10 +1502,82 @@
  	return 0;
  }
  

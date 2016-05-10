@@ -104,12 +104,17 @@ enum swlib_attr_group {
 enum swlib_port_flags {
 	SWLIB_PORT_FLAG_TAGGED = (1 << 0),
 };
-
+ 
+enum swlib_link_flags {
+	SWLIB_LINK_FLAG_EEE_100BASET = (1 << 0),
+	SWLIB_LINK_FLAG_EEE_1000BASET = (1 << 1),
+};
 
 struct switch_dev;
 struct switch_attr;
 struct switch_port;
 struct switch_port_map;
+struct switch_port_link;
 struct switch_ext;
 struct switch_val;
 struct uci_package;
@@ -139,6 +144,7 @@ struct switch_val {
 		char *s;
 		int i;
 		struct switch_port *ports;
+		struct switch_port_link *link;
 		struct switch_ext *ext_val;
 	} value;
 };
@@ -167,6 +173,17 @@ struct switch_ext {
 	const char *option_name;
 	const char *option_value;
 	struct switch_ext *next;
+};
+
+struct switch_port_link {
+	int link:1;
+	int duplex:1;
+	int aneg:1;
+	int tx_flow:1;
+	int rx_flow:1;
+	int speed;
+	/* in ethtool adv_t format */
+	uint32_t eee;
 };
 
 /**

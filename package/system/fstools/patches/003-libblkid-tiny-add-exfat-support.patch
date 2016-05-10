@@ -1,8 +1,8 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -29,6 +29,7 @@
- 		libblkid-tiny/squashfs.c
+@@ -30,6 +30,7 @@
  		libblkid-tiny/btrfs.c
+ 		libblkid-tiny/f2fs.c
  		libblkid-tiny/ntfs.c
 +		libblkid-tiny/exfat.c
  		)
@@ -160,9 +160,9 @@
 +
 --- a/libblkid-tiny/libblkid-tiny.c
 +++ b/libblkid-tiny/libblkid-tiny.c
-@@ -225,6 +225,7 @@
- 	&hfs_idinfo,
+@@ -227,6 +227,7 @@
  	&btrfs_idinfo,
+ 	&f2fs_idinfo,
  	&ntfs_idinfo,
 +	&exfat_idinfo,
  };
