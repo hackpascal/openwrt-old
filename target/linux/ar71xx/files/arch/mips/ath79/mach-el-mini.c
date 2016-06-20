@@ -24,8 +24,6 @@
 #define MINI_GPIO_LED_SYSTEM	27
 #define MINI_GPIO_BTN_RESET	11
 
-#define MINI_GPIO_USB_POWER	8
-
 #define MINI_KEYS_POLL_INTERVAL	20	/* msecs */
 #define MINI_KEYS_DEBOUNCE_INTERVAL	(3 * MINI_KEYS_POLL_INTERVAL)
 
@@ -69,9 +67,6 @@ static void __init el_mini_setup(void)
 					ARRAY_SIZE(mini_gpio_keys),
 					mini_gpio_keys);
 
-	gpio_request_one(MINI_GPIO_USB_POWER,
-			 GPIOF_OUT_INIT_HIGH | GPIOF_EXPORT_DIR_FIXED,
-			 "USB power");
 	ath79_register_usb();
 
 	ath79_init_mac(ath79_eth0_data.mac_addr, mac, -1);
