@@ -110,6 +110,17 @@ tew-673gru)
 		"0:lan" "1:lan" "2:lan" "3:lan" "5@eth0"
 	;;
 
+dw33d)
+	# FIXME: 无法驱动 RGMII 接口（eth0），因此使用 tagged VLAN 的划分方式
+	ucidef_add_switch "switch0" \
+		"0@eth1" "1:wan" "2:lan:1" "3:lan:2" "4:lan:3" "5:lan:4"
+
+	# 下面为 eth0 正常时使用的 untagged VLAN 划分
+	# ucidef_set_interfaces_lan_wan "eth1" "eth0"
+	# ucidef_add_switch "switch0" \
+	# 	"0@eth1" "2:lan" "3:lan" "4:lan" "5:lan" "6@eth0" "1:wan"
+	;;
+
 f9k1115v2)
 	ucidef_set_interfaces_lan_wan "eth1" "eth0"
 	ucidef_add_switch "switch0" \

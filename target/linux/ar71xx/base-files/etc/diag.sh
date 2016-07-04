@@ -110,6 +110,9 @@ get_status_led() {
 	dlan-pro-1200-ac)
 		status_led="devolo:status:wlan"
 		;;
+	dw33d)
+		status_led="dw33d:blue:status"
+		;;
 	dr344)
 		status_led="dr344:green:status"
 		;;

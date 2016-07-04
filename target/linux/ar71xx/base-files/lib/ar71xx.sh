@@ -510,6 +510,9 @@ ar71xx_board_detect() {
 	*"dLAN pro 1200+ WiFi ac")
 		name="dlan-pro-1200-ac"
 		;;
+	*"DomyWifi DW33D")
+		name="dw33d"
+		;;
 	*DR344)
 		name="dr344"
 		;;

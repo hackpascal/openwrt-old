@@ -248,6 +248,12 @@ dlan-pro-1200-ac)
 	ucidef_set_led_gpio "plcr" "dLAN" "devolo:error:dlan" "16" "0"
 	;;
 
+dw33d)
+	ucidef_set_led_usbdev "mmc" "MMC" "dw33d:blue:mmc" "1-1"
+	ucidef_set_led_usbdev "usb" "USB" "dw33d:blue:usb" "2-1"
+	ucidef_set_led_wlan "wlan2g" "WLAN2G" "dw33d:blue:wlan2g" "phy1tpt"
+	;;
+
 gl-ar150)
 	ucidef_set_led_wlan "wlan" "WLAN" "gl_ar150:wlan" "phy0tpt"
 	;;
