@@ -821,6 +821,11 @@ zcn-1523h-5)
 	ucidef_set_led_netdev "lan1" "lan1" "zcn-1523h:green:lan1" "eth0"
 	ucidef_set_led_netdev "lan2" "lan2" "zcn-1523h:green:lan2" "eth1"
 	;;
+
+maselink-ap2600i)
+	ucidef_set_led_netdev "wan" "WAN" "ap2600i:green:run" "eth0"
+	ucidef_set_led_wlan "wlan" "WLAN" "ap2600i:green:wlan" "phy0tpt"
+	;;
 esac
 
 board_config_flush

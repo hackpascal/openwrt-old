@@ -428,6 +428,9 @@ get_status_led() {
 	wlr8100)
 		status_led="sitecom:amber:status"
 		;;
+	maselink-ap2600i)
+		status_led="ap2600i:green:power"
+		;;
 	esac
 }
 

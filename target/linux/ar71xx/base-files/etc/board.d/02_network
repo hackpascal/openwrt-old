@@ -383,6 +383,7 @@ tube2h |\
 unifiac |\
 wndap360 |\
 mynet-rext |\
+maselink-ap2600i |\
 wp543)
 	ucidef_set_interface_lan "eth0"
 	;;
