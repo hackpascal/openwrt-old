@@ -120,6 +120,9 @@ tplink_board_detect() {
 	"120000"*)
 		model="MERCURY MAC1200R"
 		;;
+	"031600"*)
+		model="Mercury MW316R"
+		;;
 	"007260"*)
 		model="TellStick ZNet Lite"
 		;;
@@ -591,6 +594,9 @@ ar71xx_board_detect() {
 		;;
 	*"MAC1200R")
 		name="mc-mac1200r"
+		;;
+	*"MW316R v1")
+		name="mw316r-v1"
 		;;
 	*"MiniBox V1.0")
 		name="minibox-v1"

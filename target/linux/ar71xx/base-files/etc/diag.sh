@@ -161,7 +161,8 @@ get_status_led() {
 	ls-sr71)
 		status_led="ubnt:green:d22"
 		;;
-	mc-mac1200r)
+	mc-mac1200r | \
+	mw316r-v1)
 		status_led="mercury:green:system"
 		;;
 	mr12)

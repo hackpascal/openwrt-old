@@ -262,6 +262,7 @@ enum ath79_mach_type {
 	ATH79_MACH_ZCN_1523H_5,		/* Zcomax ZCN-1523H-5-xx */
 	ATH79_MACH_DOMYWIFI_DW33D,	/* DomyWifi DW33D */
 	ATH79_MACH_MASELINK_AP2600I,	/* Comba MASELink AP2600-I */
+	ATH79_MACH_MW316R_V1,		/* Mercury MW316R v1 */
 };
 
 #endif /* _ATH79_MACHTYPE_H */

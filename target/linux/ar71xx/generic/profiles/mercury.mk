@@ -15,3 +15,14 @@ define Profile/MAC1200R/Description
 	Package set optimized for the MERCURY MAC1200R.
 endef
 $(eval $(call Profile,MAC1200R))
+
+
+define Profile/MW316R
+	NAME:=MERCURY MW316R
+	PACKAGES:=kmod-ath9k
+endef
+
+define Profile/MW316R/Description
+	Package set optimized for the MERCURY MW316R.
+endef
+$(eval $(call Profile,MW316R))

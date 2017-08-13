@@ -341,6 +341,7 @@ platform_check_image() {
 	el-mini | \
 	gl-inet | \
 	mc-mac1200r | \
+	mw316r-v1 | \
 	minibox-v1 |\
 	omy-g1 |\
 	omy-x1 |\
