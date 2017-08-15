@@ -201,6 +201,7 @@ platform_check_image() {
 	wpj558 | \
 	maselink-ap2600i | \
 	maselink-ap2600ifm | \
+	sgr-w500-ebi-fit-v3 | \
 	zcn-1523h-2 | \
 	zcn-1523h-5)
 		[ "$magic_long" != "68737173" -a "$magic_long" != "19852003" ] && {

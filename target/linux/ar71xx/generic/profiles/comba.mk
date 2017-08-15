@@ -27,3 +27,15 @@ define Profile/AP2600IFM/Description
 endef
 
 $(eval $(call Profile,AP2600IFM))
+
+
+define Profile/SGRW500EBIFITV3
+	NAME:=GRENTECH SGR-W500-EBI(FIT) v3.0
+	PACKAGES:=kmod-usb-core kmod-usb2 kmod-usb-storage
+endef
+
+define Profile/SGRW500EBIFITV3/Description
+	Package set optimized for the GRENTECH SGR-W500-EBI(FIT) v3.0 board.
+endef
+
+$(eval $(call Profile,SGRW500EBIFITV3))

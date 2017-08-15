@@ -1117,6 +1117,9 @@ ar71xx_board_detect() {
 	*"MASELink AP2600-IFM")
 		name="maselink-ap2600ifm"
 		;;
+	'GRENTECH SGR-W500-EBI(FIT) v3.0')
+		name="sgr-w500-ebi-fit-v3"
+		;;
 	esac
 
 	[ -z "$AR71XX_MODEL" ] && [ "${machine:0:8}" = 'TP-LINK ' ] && \

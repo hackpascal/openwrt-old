@@ -2504,6 +2504,7 @@ $(eval $(call SingleProfile,AthLzma,64k,YUN_16M,yun-16M,Yun,ttyATH0,250000,$$(yu
 $(eval $(call SingleProfile,AthLzma,64k,DW33D,domywifi-dw33d,DW33D,ttyS0,115200,$$(dw33d_mtdlayout) norootfssplit,RKuImage))
 $(eval $(call SingleProfile,AthLzma,64k,AP2600I,maselink-ap2600i,AP2600I,ttyS0,115200,$$(ap147_mtdlayout),RKuImage))
 $(eval $(call SingleProfile,AthLzma,256k,AP2600IFM,maselink-ap2600ifm,AP2600IFM,ttyS0,115200,$$(ap2600ifm_256kblk_mtdlayout) ahbskip=1,KRuImage))
+$(eval $(call SingleProfile,AthLzma,64k,SGRW500EBIFITV3,sgr-w500-ebi-fit-v3,SGRW500EBIFITV3,ttyS0,115200,$$(ap96_mtdlayout),RKuImage))
 
 $(eval $(call SingleProfile,Belkin,64k,F9K1115V2,f9k1115v2,F9K1115V2,ttyS0,115200,$$(f9k1115v2_mtdlayout),BR-6679BAC))
 
