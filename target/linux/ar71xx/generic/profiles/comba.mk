@@ -15,3 +15,15 @@ define Profile/AP2600I/Description
 endef
 
 $(eval $(call Profile,AP2600I))
+
+
+define Profile/AP2600IFM
+	NAME:=Comba MASELink AP2600-IFM board
+	PACKAGES:=kmod-usb-core kmod-usb2 kmod-usb-storage
+endef
+
+define Profile/AP2600IFM/Description
+	Package set optimized for the Comba MASELink AP2600-IFM board.
+endef
+
+$(eval $(call Profile,AP2600IFM))

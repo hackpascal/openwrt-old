@@ -432,6 +432,9 @@ get_status_led() {
 	maselink-ap2600i)
 		status_led="ap2600i:green:power"
 		;;
+	maselink-ap2600ifm)
+		status_led="ap2600ifm:green:power"
+		;;
 	esac
 }
 

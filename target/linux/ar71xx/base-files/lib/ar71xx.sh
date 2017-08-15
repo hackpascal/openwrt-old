@@ -1114,6 +1114,9 @@ ar71xx_board_detect() {
 	*"MASELink AP2600-I")
 		name="maselink-ap2600i"
 		;;
+	*"MASELink AP2600-IFM")
+		name="maselink-ap2600ifm"
+		;;
 	esac
 
 	[ -z "$AR71XX_MODEL" ] && [ "${machine:0:8}" = 'TP-LINK ' ] && \

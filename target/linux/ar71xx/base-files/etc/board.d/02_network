@@ -384,6 +384,7 @@ unifiac |\
 wndap360 |\
 mynet-rext |\
 maselink-ap2600i |\
+maselink-ap2600ifm |\
 wp543)
 	ucidef_set_interface_lan "eth0"
 	;;

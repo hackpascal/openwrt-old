@@ -834,6 +834,11 @@ maselink-ap2600i)
 	ucidef_set_led_netdev "wan" "WAN" "ap2600i:green:run" "eth0"
 	ucidef_set_led_wlan "wlan" "WLAN" "ap2600i:green:wlan" "phy0tpt"
 	;;
+
+maselink-ap2600ifm)
+	ucidef_set_led_wlan "wlan1" "WLAN1" "ap2600ifm:green:rf1" "phy0tpt"
+	ucidef_set_led_wlan "wlan2" "WLAN2" "ap2600ifm:green:rf2" "phy1tpt"
+	;;
 esac
 
 board_config_flush

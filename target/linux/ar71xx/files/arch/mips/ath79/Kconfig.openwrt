@@ -1625,3 +1625,12 @@ config ATH79_MACH_MW316R_V1
        select ATH79_DEV_LEDS_GPIO
        select ATH79_DEV_M25P80
        select ATH79_DEV_WMAC
+
+config ATH79_MACH_MASELINK_AP2600IFM
+	bool "Comba MASELink AP2600-IFM support"
+	select SOC_AR71XX
+	select ATH79_DEV_ETH
+	select ATH79_DEV_GPIO_BUTTONS
+	select ATH79_DEV_LEDS_GPIO
+	select ATH79_DEV_M25P80
+	select ATH79_DEV_USB
