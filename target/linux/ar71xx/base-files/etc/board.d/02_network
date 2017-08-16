@@ -386,6 +386,7 @@ mynet-rext |\
 maselink-ap2600i |\
 maselink-ap2600ifm |\
 sgr-w500-ebi-fit-v3 |\
+sgr-w500-n85b-v2 |\
 wp543)
 	ucidef_set_interface_lan "eth0"
 	;;

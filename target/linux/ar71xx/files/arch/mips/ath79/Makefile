@@ -210,3 +210,4 @@ obj-$(CONFIG_ATH79_MACH_MASELINK_AP2600I)	+= mach-maselink-ap2600i.o
 obj-$(CONFIG_ATH79_MACH_MW316R_V1)	+= mach-mw316r-v1.o
 obj-$(CONFIG_ATH79_MACH_MASELINK_AP2600IFM)	+= mach-maselink-ap2600ifm.o
 obj-$(CONFIG_ATH79_MACH_SGR_W500_EBI_FIT_V3)	+= mach-sgr-w500-ebi-fit-v3.o
+obj-$(CONFIG_ATH79_MACH_SGR_W500_N85B_V2)	+= mach-sgr-w500-n85b-v2.o

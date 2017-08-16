@@ -435,7 +435,8 @@ get_status_led() {
 	maselink-ap2600ifm)
 		status_led="ap2600ifm:green:power"
 		;;
-	sgr-w500-ebi-fit-v3)
+	sgr-w500-ebi-fit-v3 | \
+	sgr-w500-n85b-v2)
 		status_led="grentech:green:status"
 		;;
 	esac

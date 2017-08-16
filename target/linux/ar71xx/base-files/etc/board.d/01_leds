@@ -844,6 +844,10 @@ sgr-w500-ebi-fit-v3)
 	ucidef_set_led_netdev "wan" "WAN" "grentech:green:wan" "eth0"
 	ucidef_set_led_wlan "wlan" "WLAN" "grentech:green:wlan" "phy0tpt"
 	;;
+
+sgr-w500-n85b-v2)
+	ucidef_set_led_wlan "wlan" "WLAN" "grentech:green:wlan2g" "phy0tpt"
+	;;
 esac
 
 board_config_flush

@@ -39,3 +39,15 @@ define Profile/SGRW500EBIFITV3/Description
 endef
 
 $(eval $(call Profile,SGRW500EBIFITV3))
+
+
+define Profile/SGRW500N85BV2
+	NAME:=GRENTECH SGR-W500-N85b v2.0
+	PACKAGES:=kmod-usb-core kmod-usb2 kmod-usb-storage
+endef
+
+define Profile/SGRW500N85BV2/Description
+	Package set optimized for the GRENTECH SGR-W500-N85b v2.0 board.
+endef
+
+$(eval $(call Profile,SGRW500N85BV2))
