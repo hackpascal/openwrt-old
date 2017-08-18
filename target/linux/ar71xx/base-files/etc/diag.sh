@@ -432,6 +432,9 @@ get_status_led() {
 	maselink-ap2600i)
 		status_led="ap2600i:green:power"
 		;;
+	belair20e11)
+		status_led="belair:blue:power"
+		;;
 	esac
 }
 

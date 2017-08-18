@@ -834,6 +834,13 @@ maselink-ap2600i)
 	ucidef_set_led_netdev "wan" "WAN" "ap2600i:green:run" "eth0"
 	ucidef_set_led_wlan "wlan" "WLAN" "ap2600i:green:wlan" "phy0tpt"
 	;;
+
+belair20e11)
+	ucidef_set_led_wlan "wlan2g" "WLAN2G" "belair:blue:wlan2g" "phy0tpt"
+	ucidef_set_led_wlan "wlan5g" "WLAN5G" "belair:blue:wlan5g" "phy1tpt"
+	ucidef_set_led_switch "internet" "INTERNET" "belair:blue:internet" "switch0" "0x20"
+	;;
+
 esac
 
 board_config_flush
