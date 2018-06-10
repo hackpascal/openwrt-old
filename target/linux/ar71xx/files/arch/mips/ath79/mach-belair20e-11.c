@@ -37,6 +37,8 @@
 #define BELAIR_GPIO_BTN_WPS		12
 #define BELAIR_GPIO_BTN_RESET		17
 
+#define BELAIR_GPIO_USB_POWER		14
+
 #define BELAIR_KEYS_POLL_INTERVAL	20	/* msecs */
 #define BELAIR_KEYS_DEBOUNCE_INTERVAL	(3 * BELAIR_KEYS_POLL_INTERVAL)
 
@@ -153,6 +155,10 @@ static void __init belair_setup(void)
 	ath79_eth0_data.mii_bus_dev = &ath79_mdio0_device.dev;
 	ath79_eth0_pll_data.pll_1000 = 0x06000000;
 	ath79_register_eth(0);
+
+	gpio_request_one(BELAIR_GPIO_USB_POWER,
+			 GPIOF_OUT_INIT_HIGH | GPIOF_EXPORT_DIR_FIXED,
+			 "USB power");
 
 	ath79_register_usb();
 }
